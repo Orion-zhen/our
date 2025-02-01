@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Basic -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Mobile Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Site Metas -->
+  <meta name="keywords" content="archlinux" />
+  <meta name="description" content="Orion User's Repository" />
+  <meta name="author" content="Orion-zhen" />
+
+  <title>OUR</title>
+
+  <!-- slider stylesheet -->
+  <!-- slider stylesheet -->
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+
+  <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+
+  <!-- fonts style -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Poppins:400,700&display=swap" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="hero_area">
+    <!-- header section strats -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container pt-3">
+          <a class="navbar-brand" href="index.html">
+            <span>
+              OUR
+            </span>
+          </a>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
+              <ul class="navbar-nav  ">
+                <li class="nav-item">
+                  <a class="nav-link" href="x86_64/index.html"> Packages </a>
+                </li>
+                <li class="nav-item active">
+                  <a class="nav-link" href="https://github.com/Orion-zhen/our"> GitHub <span
+                      class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://huggingface.co/Orion-zhen/our"> Huggingface </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+    <!-- slider section -->
+    <section class=" slider_section position-relative">
+      <div class="container">
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="row">
+                <div class="col">
+                  <div class="detail-box">
+                    <div>
+                      <h2>
+                        welcome to
+                      </h2>
+                      <h1>
+                        our repository
+                      </h1>
+                      <p>
+                        Orion User's Repository for Arch Linux
+                      </p>
+                      <div class="">
+                        <a href="https://github.com/Orion-zhen/our">
+                          Check details
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+  </div>
+
+  </div>
+  </section>
+  <!-- end slider section -->
+  </div>
+
+  <!-- do section -->
+
+  <section class="do_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2>
+          What the repo do
+        </h2>
+        <p>
+          The repo uses GitHub Actions to auto build some AUR packages and release them to GitHub and Huggingface daily.
+        </p>
+      </div>
+      <div class="do_container">
+        <div class="box arrow-start arrow_bg">
+          <div class="img-box">
+            <img src="images/d-1.png" alt="">
+          </div>
+          <div class="detail-box">
+            <h6>
+              Update
+            </h6>
+          </div>
+        </div>
+        <div class="box arrow-middle arrow_bg">
+          <div class="img-box">
+            <img src="images/d-2.png" alt="">
+          </div>
+          <div class="detail-box">
+            <h6>
+              Build
+            </h6>
+          </div>
+        </div>
+        <div class="box ">
+          <div class="img-box">
+            <img src="images/d-3.png" alt="">
+          </div>
+          <div class="detail-box">
+            <h6>
+              Publish
+            </h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- end do section -->
+
+  <!-- who section -->
+
+  <section class="who_section ">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5">
+          <div class="img-box">
+            <img src="images/who-img.jpg" alt="">
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="detail-box">
+            <div class="heading_container">
+              <h2>
+                Usage
+              </h2>
+            </div>
+            <p>
+              Add the following to your pacman.conf file to enable the OUR repository:
+            <pre class="hljs"><code><div>[our]
+Server = https://github.com/Orion-zhen/our/raw/refs/heads/main/$arch</code></div></pre>
+            Command line:
+            <pre class="hljs"><code><div>sudo tee -a /etc/pacman.conf << EOF
+[our]
+Server = https://github.com/Orion-zhen/our/raw/refs/heads/main/$arch
+EOF</code></div></pre>
+            Then refresh the package database:
+            <pre class="hljs"><code><div>sudo pacman -Syu</code></div></pre>
+            You can now install packages from the OUR repository 🚀
+            </p>
+            <div>
+              <a href="https://github.com/Orion-zhen/our">
+                Read More
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- end who section -->
+
+  <!-- work section -->
+  <section class="work_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2>
+          Package Request
+        </h2>
+        <p>
+          If you have some nice AUR packages and want to add it to this repository, you can make a package request by
+          issueing on the GitHub page.
+        </p>
+      </div>
+      <div class="work_container layout_padding2">
+        <div class="box b-2">
+          <img src="images/w-2.jpg" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- end work section -->
+
+  <!-- client section -->
+  <section class="client_section">
+    <div class="container">
+      <div class="heading_container">
+        <h2>
+          Avalable Sources
+        </h2>
+      </div>
+      <div class="carousel-wrap ">
+        <div class="owl-carousel">
+          <div class="item">
+            <div class="box">
+              <div class="detail-box">
+                <h5>
+                  GitHub <br>
+                  <span>
+                    Dipiscing elit
+                  </span>
+                </h5>
+                <img src="images/quote.png" alt="">
+                <p>
+                  Server = https://orion-zhen.github.io/our/$arch
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="box">
+              <div class="detail-box">
+                <h5>
+                  Huggingface <br>
+                  <span>
+                    Dipiscing elit
+                  </span>
+                </h5>
+                <img src="images/quote.png" alt="">
+                <p>
+                  https://huggingface.co/Orion-zhen/our
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="box">
+              <div class="detail-box">
+                <h5>
+                  hf-mirror <br>
+                  <span>
+                    Dipiscing elit
+                  </span>
+                </h5>
+                <img src="images/quote.png" alt="">
+                <p>
+                  https://hf-mirror.com/Orion-zhen/our
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- end client section -->
+
+
+  <!-- footer section -->
+  <section class="container-fluid footer_section">
+    <p>
+      Licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0</a>
+    </p>
+    <p>
+      Copyleft @ 2025 Orion-zhen
+    </p>
+  </section>
+  <!-- footer section -->
+
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+  </script>
+  <!-- owl carousel script 
+    -->
+  <script type="text/javascript">
+    $(".owl-carousel").owlCarousel({
+      loop: true,
+      margin: 0,
+      navText: [],
+      center: true,
+      autoplay: true,
+      autoplayHoverPause: true,
+      responsive: {
+        0: {
+          items: 1
+        },
+        1000: {
+          items: 3
+        }
+      }
+    });
+  </script>
+  <!-- end owl carousel script -->
+
+</body>
+
+</html>
