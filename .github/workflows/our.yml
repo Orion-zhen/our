@@ -16,15 +16,18 @@ jobs:
       matrix:
         repos:
           - nodejs-gitmoji-cli
-          # - hiddify
+          - hiddify
+          - hiddify-next-bin
           - hyprland-interactive-screenshot
           - udevil-git
           - pmount
           - mihomo
+          - mihomo-party
           - clash2singbox-git
           - fcitx5-skin-fluentdark-git
           - fcitx5-skin-fluentlight-git
           - vmware-unlocker
+          - vmware-workstation
           - watt-toolkit-bin
           - hfd-git
           - wsl-open
