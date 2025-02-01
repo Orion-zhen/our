@@ -29,7 +29,7 @@ jobs:
 
       - name: Build AUR package
         run: |
-          bash build-one.sh ${{ github.event.inputs.package }}
+          bash scripts/build-one.sh ${{ github.event.inputs.package }}
 
       - name: Calculate file size
         run: |
