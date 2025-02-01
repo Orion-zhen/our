@@ -1,10 +1,10 @@
 #!/bin/bash
 
 shopt -s nullglob
-files=(x86_64/*.pkg.tar.zst)
+files=(*.pkg.tar.zst)
 
 if [[ ${#files[@]} -eq 0 ]]; then
-    echo "ERROR: no .pkg.tar.zst files in x86_64!"
+    echo "ERROR: no .pkg.tar.zst files!"
     exit 1
 fi
 
