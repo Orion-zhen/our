@@ -1,0 +1,182 @@
+name: OUR Publish
+
+on:
+  schedule:
+    - cron: 0 0 * * * 
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/our.yml"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        repos:
+          - nodejs-gitmoji-cli
+          # - hiddify
+          - hyprland-interactive-screenshot
+          - udevil-git
+          - pmount
+          - mihomo
+          - clash2singbox-git
+          - fcitx5-skin-fluentdark-git
+          - fcitx5-skin-fluentlight-git
+          - vmware-unlocker
+          - watt-toolkit-bin
+          - hfd-git
+          - wsl-open
+          - wsl2-ssh-agent
+          - chatbox-bin
+      fail-fast: false
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+    #   - name: Free disk space (Ubuntu)
+    #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/pacman.conf >> /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+            bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
+  repo-add:
+    needs: build
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+    #   - name: Free disk space (Ubuntu)
+    #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Generate repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+            bash scripts/repo-add.sh our
+
+      - name: Upload repo.db
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: repo-db
+          path: |
+            x86_64/*.db*
+            x86_64/*.files*
+
+  publish-to-page:
+    needs: repo-add
+    concurrency:
+      group: publish-to-page
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Generate package index
+        run: |
+          python scripts/gen-index.py
+
+      - name: Setup pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  publish-to-hf:
+    needs: repo-add
+    concurrency:
+      group: publish-to-hf
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Release to huggingface
+        continue-on-error: true
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install -U huggingface_hub
+          huggingface-cli upload-large-folder --token $HF_TOKEN --repo-type model Orion-zhen/our . --no-bars
