@@ -1,0 +1,26 @@
+name: Clean Workflow Logs
+
+on:
+  schedule:
+    - cron: 0 0 * * 1
+  workflow_dispatch:
+    inputs:
+      runs_older_than:
+        description: "The number of days old to delete"
+        default: "7"
+        required: false
+
+env:
+  SCHEDULED_RUNS_OLDER_THAN: "7"
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Clean workflow logs
+        uses: igorjs/gh-actions-clean-workflow@v6
+        with:
+          runs_older_than: ${{ github.event.inputs.runs_older_than }} || env.SCHEDULED_RUNS_OLDER_THAN
+
