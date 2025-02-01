@@ -3,6 +3,9 @@
 export ROOT_DIR=$(pwd)
 export repo=$1
 
+pacman-key --recv-keys $GPG_SIG_KEY
+pacman-key -lsign-key $PGP_SIG_KEY
+
 git clone "https://aur.archlinux.org/${repo}.git"
 cd "$ROOT_DIR/$repo"
 makepkg -scfL --noconfirm --noprogressbar --sign --key $GPG_SIG_KEY
