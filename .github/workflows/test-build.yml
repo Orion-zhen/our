@@ -24,7 +24,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Import GPG
