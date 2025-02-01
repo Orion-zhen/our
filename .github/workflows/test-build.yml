@@ -1,0 +1,36 @@
+name: Test Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "AUR package to test build"
+        required: true
+        type: string
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/pacman.conf >> /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Build AUR package
+        run: |
+          bash build-one.sh ${{ github.event.inputs.package }}
+
+      - name: Calculate file size
+        run: |
+          bash file-size.sh
