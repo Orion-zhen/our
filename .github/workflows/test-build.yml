@@ -26,6 +26,7 @@ jobs:
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
+          yay --noconfirm
 
       - name: Import GPG
         uses: crazy-max/ghaction-import-gpg@v6
