@@ -80,22 +80,24 @@ HTML_TEMPLATE_HEAD = """<!DOCTYPE html>
 <body>
     <div class="container">
         <h2>Packages</h2>
-        <ul>
+        <div class="list-container">
+            <ul>
 """
 
 HTML_TEMPLATE_TAIL = """
-        </ul>
+            </ul>
+        </div>
     </div>
 </body>
 
 </html>
 """
 
-LI_TEMPLATE = """            <li>
-                <div style="display: flex; justify-content: space-between; width: 100%;">
-                    <a style="text-align: left;" href="{file}">{file}</a>{size:.2f} MiB
-                </div>
-            </li>
+LI_TEMPLATE = """                <li>
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <a style="text-align: left;" href="{file}">{file}</a>{size:.2f} MiB
+                    </div>
+                </li>
 """
 
 
@@ -108,9 +110,20 @@ def generate_html(directory):
     files.sort()
 
     html_content = [HTML_TEMPLATE_HEAD]
+    exclude_files = [
+        "index.html",
+        "our.db",
+        "our.db.sig",
+        "our.files",
+        "our.files.sig",
+        "our.db.tar.gz",
+        "our.db.tar.gz.sig",
+        "our.files.tar.gz",
+        "our.files.tar.gz.sig",
+    ]
 
     for file, size in files:
-        if file == "index.html":
+        if file in exclude_files:
             continue
         html_content.append(LI_TEMPLATE.format(file=file, size=size))
 
