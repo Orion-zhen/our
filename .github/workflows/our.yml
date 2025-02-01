@@ -34,7 +34,9 @@ jobs:
           - wsl2-ssh-agent
           - chatbox-bin
           - mspinball-bin
-          - linuxqq
+          - wechat-bin
+          - portable
+          - wemeet-wayland-screenshare-git
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
