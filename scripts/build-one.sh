@@ -5,6 +5,9 @@ export repo=$1
 
 git clone "https://aur.archlinux.org/${repo}.git"
 cd "$ROOT_DIR/$repo"
+
+yay -S --asdeps --noconfirm $(grep -Po '(?<=^depends=\().*?(?=\))' PKGBUILD | tr -d "'")
+
 makepkg -scfL --noconfirm --noprogressbar --sign --key $GPG_SIG_KEY
 rm -rf *-debug-*
 
