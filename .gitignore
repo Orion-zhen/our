@@ -11,3 +11,5 @@
 
 pkg/
 src/
+builds/
+x86_64/
