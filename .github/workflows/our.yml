@@ -33,6 +33,7 @@ jobs:
           - wsl-open
           - wsl2-ssh-agent
           - chatbox-bin
+          - mspinball-bin
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
