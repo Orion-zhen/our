@@ -28,6 +28,8 @@ jobs:
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Build AUR package
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
           bash scripts/build-one.sh ${{ github.event.inputs.package }}
 
