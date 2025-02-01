@@ -22,19 +22,26 @@ HTML_TEMPLATE_HEAD = """<!DOCTYPE html>
         }
 
         .container {
+            display: flex;
+            flex-direction: column;
             text-align: center;
             width: 60%;
             height: 80%;
             background-color: #DDE6ED;
             box-shadow: 0 4px 8px #526D82;
             border-radius: 8px;
-            overflow: hidden;
             padding: 20px 0;
         }
 
         h2 {
             margin: 0;
             padding: 10px 0;
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
         }
 
         ul {
