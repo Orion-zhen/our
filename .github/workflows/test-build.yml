@@ -33,4 +33,4 @@ jobs:
 
       - name: Calculate file size
         run: |
-          bash file-size.sh
+          bash scripts/file-size.sh
