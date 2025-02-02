@@ -15,33 +15,33 @@ jobs:
     strategy:
       matrix:
         repos:
-          - nodejs-gitmoji-cli
-          - fvm
-          - hiddify-next-bin
-          - hyprland-interactive-screenshot
-          - udevil-git
-          - pmount
+          # - nodejs-gitmoji-cli
+          # - fvm
+          # - hiddify-next-bin
+          # - hyprland-interactive-screenshot
+          # - udevil-git
+          # - pmount
           - clash-geoip
-          - mihomo-party
-          - clash2singbox-git
-          - fcitx5-skin-fluentdark-git
-          - fcitx5-skin-fluentlight-git
-          # - vmware-workstation
-          - watt-toolkit-bin
-          - hfd-git
-          - wsl-open
-          - wsl2-ssh-agent
-          - chatbox-bin
-          - wechat-bin
-          - wemeet-bin
-          - portable
-          - snapd-xdg-open-git
+          # - mihomo-party
+          # - clash2singbox-git
+          # - fcitx5-skin-fluentdark-git
+          # - fcitx5-skin-fluentlight-git
+          # - watt-toolkit-bin
+          # - hfd-git
+          # - wsl-open
+          # - wsl2-ssh-agent
+          # - chatbox-bin
+          # - wechat-bin
+          # - wemeet-bin
+          # - portable
+          # - snapd-xdg-open-git
 
           # - hiddify # depon fvm
           # - mihomo # depon clash-geoip
           # - vmware-unlocker # depon vmware-workstation
           # - linuxqq-nt-bwrap # depon snapd-xdg-open-git
           # - wemeet-wayland-screenshare-git # depon wemeet-bin
+          # - vmware-workstation # depon vmware-kaymap
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
