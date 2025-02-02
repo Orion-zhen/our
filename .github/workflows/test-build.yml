@@ -24,15 +24,8 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree sudo --noconfirm --overwrite '*'
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Add a builder user
-        run: |
-          useradd -m -s /bin/bash builder
-          echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-          chown -R builder:builder .
-          su - builder
 
       - name: Import GPG
         uses: crazy-max/ghaction-import-gpg@v6
@@ -52,7 +45,7 @@ jobs:
 
       - name: Rename illigal characters
         run: |
-          for file in *:*; do mv "$file" "${file//:/_}"; done
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
 
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
