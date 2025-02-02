@@ -43,3 +43,14 @@ jobs:
       - name: Calculate file size
         run: |
           bash scripts/file-size.sh
+
+      - name: Rename illigal characters
+        run: |
+          for file in *:*; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ github.event.inputs.package }}
+          path: |
+            *.zst*
