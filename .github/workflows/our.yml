@@ -26,7 +26,7 @@ jobs:
           - clash2singbox-git
           - fcitx5-skin-fluentdark-git
           - fcitx5-skin-fluentlight-git
-          - vmware-workstation
+          # - vmware-workstation
           - watt-toolkit-bin
           - hfd-git
           - wsl-open
