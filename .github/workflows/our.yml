@@ -132,7 +132,7 @@ jobs:
         run: |
           bash scripts/repo-add.sh our-tmp
           echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = PackageRequired" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
           echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
           pacman -Syu --noconfirm --overwrite '*'
 
