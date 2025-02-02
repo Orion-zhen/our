@@ -16,17 +16,16 @@ jobs:
       matrix:
         repos:
           - nodejs-gitmoji-cli
-          - hiddify
+          - fvm
           - hiddify-next-bin
           - hyprland-interactive-screenshot
           - udevil-git
           - pmount
-          - mihomo
+          - clash-geoip
           - mihomo-party
           - clash2singbox-git
           - fcitx5-skin-fluentdark-git
           - fcitx5-skin-fluentlight-git
-          - vmware-unlocker
           - vmware-workstation
           - watt-toolkit-bin
           - hfd-git
@@ -35,13 +34,18 @@ jobs:
           - chatbox-bin
           - mspinball-bin
           - wechat-bin
+          - wemmet-bin
           - portable
-          - wemeet-wayland-screenshare-git
           - snapd-xdg-open-git
-############################################################
-# Below are AUR packages that depend on other AUR packages #
-############################################################
-          - linuxqq-nt-bwrap # dep on snapd-xdg-open-git
+          ############################################################
+          # Below are AUR packages that depend on other AUR packages #
+          # that may not yet in the auxiliary repositories.          #
+          ############################################################
+          - hiddify # depon fvm
+          - mihomo # depon clash-geoip
+          - vmware-unlocker # depon vmware-workstation
+          - linuxqq-nt-bwrap # depon snapd-xdg-open-git
+          - wemeet-wayland-screenshare-git # depon wemeet-bin
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
