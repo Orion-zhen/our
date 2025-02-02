@@ -76,7 +76,7 @@ jobs:
 
       - name: Rename illigal characters
         run: |
-          for file in *:*; do [ -e "$file" ] && mv "$file" "${file//:/_}"; done
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
 
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
@@ -151,7 +151,7 @@ jobs:
 
       - name: Rename illigal characters
         run: |
-          for file in *:*; do [ -e "$file" ] && mv "$file" "${file//:/_}"; done
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
 
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
@@ -220,7 +220,7 @@ jobs:
 
       - name: Rename illigal characters
         run: |
-          for file in *:*; do [ -e "$file" ] && mv "$file" "${file//:/_}"; done
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
 
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
