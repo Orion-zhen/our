@@ -27,23 +27,24 @@ jobs:
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree sudo --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
+      - name: Add a builder user
+        run: |
+          useradd -m -s /bin/bash builder
+          echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+          chown -R builder:builder .
+          su - builder
+
       - name: Import GPG
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Add a builder user
-        run: |
-          useradd -m -s /bin/bash builder
-          echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-          chown -R builder:builder .
-
       - name: Build AUR package
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
-          sudo -E -u builder bash scripts/build-one.sh ${{ github.event.inputs.package }}
+          bash scripts/build-one.sh ${{ github.event.inputs.package }}
 
       - name: Calculate file size
         run: |
