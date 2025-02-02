@@ -95,15 +95,26 @@ HTML_TEMPLATE_TAIL = """
 
 LI_TEMPLATE = """                <li>
                     <div style="display: flex; justify-content: space-between; width: 100%;">
-                        <a style="text-align: left;" href="{file}">{file}</a>{size:.2f} MiB
+                        <a style="text-align: left;" href="{file}">{file}</a>{size}
                     </div>
                 </li>
 """
 
 
+def pretty_size(size):
+    if size < 1024:
+        return f"{size} Bytes"
+    elif size < 1024 * 1024:
+        return f"{size / 1024:.2f} KiB"
+    elif size < 1024 * 1024 * 1024:
+        return f"{size / (1024 * 1024):.2f} MiB"
+    else:
+        return f"{size / (1024 * 1024 * 1024):.2f} GiB"
+
+
 def generate_html(directory):
     files = files = [
-        (entry.name, entry.stat().st_size / (1024 * 1024))
+        (entry.name, entry.stat().st_size)
         for entry in os.scandir(directory)
         if entry.is_file()
     ]
@@ -125,7 +136,7 @@ def generate_html(directory):
     for file, size in files:
         if file in exclude_files:
             continue
-        html_content.append(LI_TEMPLATE.format(file=file, size=size))
+        html_content.append(LI_TEMPLATE.format(file=file, size=pretty_size(size)))
 
     html_content.append(HTML_TEMPLATE_TAIL)
 
