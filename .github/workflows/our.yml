@@ -11,37 +11,31 @@ on:
       - ".github/workflows/our.yml"
 
 jobs:
-  primary-build:
+  build-stage-1:
     strategy:
       matrix:
         repos:
-          # - nodejs-gitmoji-cli
-          # - fvm
-          # - hiddify-next-bin
-          # - hyprland-interactive-screenshot
-          # - udevil-git
-          # - pmount
+          - nodejs-gitmoji-cli
+          - fvm
+          - hiddify-next-bin
+          - hyprland-interactive-screenshot
+          - udevil-git
+          - pmount
           - clash-geoip
-          # - mihomo-party
-          # - clash2singbox-git
-          # - fcitx5-skin-fluentdark-git
-          # - fcitx5-skin-fluentlight-git
-          # - watt-toolkit-bin
-          # - hfd-git
-          # - wsl-open
-          # - wsl2-ssh-agent
-          # - chatbox-bin
-          # - wechat-bin
-          # - wemeet-bin
-          # - portable
-          # - snapd-xdg-open-git
-
-          # - hiddify # depon fvm
-          # - mihomo # depon clash-geoip
-          # - vmware-unlocker # depon vmware-workstation
-          # - linuxqq-nt-bwrap # depon snapd-xdg-open-git
-          # - wemeet-wayland-screenshare-git # depon wemeet-bin
-          # - vmware-workstation # depon vmware-kaymap
+          - mihomo-party
+          - clash2singbox-git
+          - fcitx5-skin-fluentdark-git
+          - fcitx5-skin-fluentlight-git
+          - watt-toolkit-bin
+          - hfd-git
+          - wsl-open
+          - wsl2-ssh-agent
+          - chatbox-bin
+          - wechat-bin
+          - wemeet-bin
+          - portable
+          - snapd-xdg-open-git
+          - vmware-kaymaps
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -83,16 +77,84 @@ jobs:
           path: |
             *.zst*
 
-  secondary-build:
+  build-stage-2:
     strategy:
       matrix:
         repos:
           ############################################################
           # Below are AUR packages that depend on other AUR packages #
           ############################################################
-          - mihomo
-      fail-fast: false
-    needs: primary-build
+          - hiddify # depon: fvm
+          - mihomo # depon: clash-geoip
+          - linuxqq-nt-bwrap # depon: snapd-xdg-open-git
+          - wemeet-wayland-screenshare-git # depon: wemeet-bin
+          - vmware-workstation # depon: vmware-kaymaps
+    needs: build-stage-1
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Add tmp repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
+  build-stage-3:
+    strategy:
+      matrix:
+        repos:
+          ##############################################################
+          # Below are AUR packages that depend on Stage 2 AUR packages #
+          ##############################################################
+          - vmware-unlocker # depon: vmware-workstation
+    needs: build-stage-2
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
@@ -150,7 +212,7 @@ jobs:
             *.zst*
 
   repo-add:
-    needs: secondary-build
+    needs: build-stage-3
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
