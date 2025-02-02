@@ -32,20 +32,19 @@ jobs:
           - wsl-open
           - wsl2-ssh-agent
           - chatbox-bin
-          - mspinball-bin
           - wechat-bin
-          - wemmet-bin
+          - wemeet-bin
           - portable
           - snapd-xdg-open-git
           ############################################################
           # Below are AUR packages that depend on other AUR packages #
           # that may not yet in the auxiliary repositories.          #
           ############################################################
-          - hiddify # depon fvm
-          - mihomo # depon clash-geoip
-          - vmware-unlocker # depon vmware-workstation
-          - linuxqq-nt-bwrap # depon snapd-xdg-open-git
-          - wemeet-wayland-screenshare-git # depon wemeet-bin
+          # - hiddify # depon fvm
+          # - mihomo # depon clash-geoip
+          # - vmware-unlocker # depon vmware-workstation
+          # - linuxqq-nt-bwrap # depon snapd-xdg-open-git
+          # - wemeet-wayland-screenshare-git # depon wemeet-bin
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -61,6 +60,12 @@ jobs:
         with:
           lfs: false
 
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
       - name: Prepare environment
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
@@ -68,12 +73,6 @@ jobs:
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Build AUR packages
         env:
