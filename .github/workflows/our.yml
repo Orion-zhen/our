@@ -33,6 +33,7 @@ jobs:
           - dingtalk-bin
           - listen1
           - 4kvideodownloaderplus
+          - feeluown-download
           ######################################################
           # Below are AUR packages that are depended by others #
           ######################################################
