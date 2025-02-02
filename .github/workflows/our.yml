@@ -2,7 +2,7 @@ name: OUR Publish
 
 on:
   schedule:
-    - cron: 0 0 * * * 
+    - cron: 0 0 * * *
   workflow_dispatch:
   push:
     branches:
@@ -11,7 +11,7 @@ on:
       - ".github/workflows/our.yml"
 
 jobs:
-  build:
+  primary-build:
     strategy:
       matrix:
         repos:
@@ -36,10 +36,7 @@ jobs:
           - wemeet-bin
           - portable
           - snapd-xdg-open-git
-          ############################################################
-          # Below are AUR packages that depend on other AUR packages #
-          # that may not yet in the auxiliary repositories.          #
-          ############################################################
+
           # - hiddify # depon fvm
           # - mihomo # depon clash-geoip
           # - vmware-unlocker # depon vmware-workstation
@@ -52,8 +49,8 @@ jobs:
       contents: write
 
     steps:
-    #   - name: Free disk space (Ubuntu)
-    #     uses: jlumbroso/free-disk-space@main
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,7 +66,6 @@ jobs:
       - name: Prepare environment
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
@@ -78,7 +74,66 @@ jobs:
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
-            bash scripts/build-one.sh ${{ matrix.repos }}
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
+  secondary-build:
+    strategy:
+      matrix:
+        repos:
+          ############################################################
+          # Below are AUR packages that depend on other AUR packages #
+          ############################################################
+          - mihomo
+      fail-fast: false
+    needs: primary-build
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Add tmp repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = PackageRequired" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
 
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
@@ -88,15 +143,15 @@ jobs:
             *.zst*
 
   repo-add:
-    needs: build
+    needs: secondary-build
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
       contents: write
 
     steps:
-    #   - name: Free disk space (Ubuntu)
-    #     uses: jlumbroso/free-disk-space@main
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -119,7 +174,7 @@ jobs:
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
-            bash scripts/repo-add.sh our
+          bash scripts/repo-add.sh our
 
       - name: Upload repo.db
         uses: actions/upload-artifact@v4.6.0
@@ -166,7 +221,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: '.'
+          path: "."
 
       - name: Deploy to GitHub Pages
         id: deployment
