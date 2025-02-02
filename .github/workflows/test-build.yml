@@ -43,7 +43,7 @@ jobs:
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
-          sudo -u builder bash scripts/build-one.sh ${{ github.event.inputs.package }}
+          sudo -E -u builder bash scripts/build-one.sh ${{ github.event.inputs.package }}
 
       - name: Calculate file size
         run: |
