@@ -12,7 +12,7 @@ If you want some nice packages in AUR, just feel free to issue 🤗
 
 - [x] Use hierarchical build steps to resolve dependencies between AUR packages
 - [x] Provides a variety of useful AUR packages:
-  - [x] Social Apps: [linuxqq](https://aur.archlinux.org/packages/linuxqq), [wechat](https://aur.archlinux.org/packages/wechat), [wemeet](https://aur.archlinux.org/packages/wemeet), [dingtalk](https://aur.archlinux.org/packages/dingtalk), etc.
+  - [x] Social Apps: [linuxqq](https://aur.archlinux.org/packages/linuxqq), [wechat](https://aur.archlinux.org/packages/wechat), [wemeet-bin](https://aur.archlinux.org/packages/wemeet-bin), [dingtalk-bin](https://aur.archlinux.org/packages/dingtalk-bin), etc.
   - [x] Media Apps: [bilibili](https://aur.archlinux.org/packages/bilibili), [yesplaymusic-plus](https://aur.archlinux.org/packages/yesplaymusic-plus), [listen1](https://aur.archlinux.org/packages/listen1), [4kvideodownloaderplus](https://aur.archlinux.org/packages/4kvideodownloaderplus), etc.
   - [x] Proxy tools: [mihomo](https://aur.archlinux.org/packages/mihomo), [hiddify](https://aur.archlinux.org/packages/hiddify), [watt-toolkit-bin](https://aur.archlinux.org/packages/watt-toolkit-bin), etc.
   - [x] Powerful Apps: [vmware-workstation](https://aur.archlinux.org/packages/vmware-workstation), [chatbox-bin](https://aur.archlinux.org/packages/chatbox-bin), etc.
