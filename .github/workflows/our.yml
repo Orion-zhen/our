@@ -37,6 +37,7 @@ jobs:
           - wechat-bin
           - portable
           - wemeet-wayland-screenshare-git
+          - snapd-xdg-open-git
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
