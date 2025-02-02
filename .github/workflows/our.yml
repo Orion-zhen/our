@@ -33,9 +33,13 @@ jobs:
           - chatbox-bin
           - wechat-bin
           - wemeet-bin
+          - linuxqq
           - portable
-          - snapd-xdg-open-git
+          - dingtalk-bin
           - vmware-keymaps
+          - nvm
+          - listen1
+          - 4kvideodownloaderplus
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -90,8 +94,10 @@ jobs:
           ############################################################
           - hiddify # depon: fvm
           - mihomo # depon: clash-geoip
-          - linuxqq-nt-bwrap # depon: snapd-xdg-open-git
+          - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
+          - bilibili # depon: nvm
+          - yesplaymusic-plus # depon: nvm
           - vmware-workstation # depon: vmware-keymaps
     needs: build-stage-1
     runs-on: ubuntu-latest
