@@ -38,7 +38,10 @@ jobs:
           - portable
           - wemeet-wayland-screenshare-git
           - snapd-xdg-open-git
-          - linuxqq-nt-bwrap
+############################################################
+# Below are AUR packages that depend on other AUR packages #
+############################################################
+          - linuxqq-nt-bwrap # dep on snapd-xdg-open-git
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
