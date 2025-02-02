@@ -38,6 +38,7 @@ jobs:
           - portable
           - wemeet-wayland-screenshare-git
           - snapd-xdg-open-git
+          - linuxqq-nt-bwrap
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
