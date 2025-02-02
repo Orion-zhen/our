@@ -169,11 +169,14 @@
             <p>
               Add the following to your pacman.conf file to enable the OUR repository:
             <pre class="hljs"><code><div>[our]
-Server = https://github.com/Orion-zhen/our/raw/refs/heads/main/$arch</code></div></pre>
+# Uncomment this if you encounter GPG key error
+# SigLevel = Optional TrustAll
+Server = https://orion-zhen.github.io/our/$arch</code></div></pre>
             Command line:
             <pre class="hljs"><code><div>sudo tee -a /etc/pacman.conf << EOF
 [our]
-Server = https://github.com/Orion-zhen/our/raw/refs/heads/main/$arch
+# SigLevel = Optional TrustAll
+Server = https://orion-zhen.github.io/our/$arch
 EOF</code></div></pre>
             Then refresh the package database:
             <pre class="hljs"><code><div>sudo pacman -Syu</code></div></pre>
