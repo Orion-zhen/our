@@ -70,6 +70,10 @@ jobs:
         run: |
           bash scripts/build-one.sh ${{ matrix.repos }}
 
+      - name: Rename illigal characters
+        run: |
+          for file in *:*; do mv "$file" "${file//:/_}"; done
+
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
         with:
@@ -139,6 +143,10 @@ jobs:
         run: |
           bash scripts/build-one.sh ${{ matrix.repos }}
 
+      - name: Rename illigal characters
+        run: |
+          for file in *:*; do mv "$file" "${file//:/_}"; done
+
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
         with:
@@ -203,6 +211,10 @@ jobs:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
           bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          for file in *:*; do mv "$file" "${file//:/_}"; done
 
       - name: Upload built packages
         uses: actions/upload-artifact@v4.6.0
