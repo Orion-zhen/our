@@ -37,7 +37,7 @@ jobs:
         run: |
           useradd -m -s /bin/bash builder
           echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-          chown -R builder:builder /path/to/current/directory
+          chown -R builder:builder .
 
       - name: Build AUR package
         env:
