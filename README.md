@@ -11,7 +11,9 @@ website: https://orion-zhen.github.io/our
 
 Orion User's Repository for Arch Linux
 
-The repo uses GitHub Actions to auto build some AUR packages and release them to GitHub and Huggingface daily 😉
+This repository includes a bunch of useful AUR packages that are not listed in other popular Arch repositories, such as linuxqq-nt-bwrap, wechat-bin, wemeet patches, etc.
+
+The repository builder is powered by GitHub Actions. It will automatically pull AUR packages, build them, and release to my GitHub page and Huggingface repository everyday 😉
 
 If you want some nice packages in AUR, just feel free to issue 🤗
 
