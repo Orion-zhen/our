@@ -113,6 +113,13 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
       - name: Download built packages
         uses: actions/download-artifact@v4.1.8
         with:
