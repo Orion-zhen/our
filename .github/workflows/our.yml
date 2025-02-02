@@ -16,12 +16,10 @@ jobs:
       matrix:
         repos:
           - nodejs-gitmoji-cli
-          - fvm
           - hiddify-next-bin
           - hyprland-interactive-screenshot
           - udevil-git
           - pmount
-          - clash-geoip
           - mihomo-party
           - clash2singbox-git
           - fcitx5-skin-fluentdark-git
@@ -31,15 +29,20 @@ jobs:
           - wsl-open
           - wsl2-ssh-agent
           - chatbox-bin
-          - wechat-bin
-          - wemeet-bin
           - linuxqq
-          - portable
           - dingtalk-bin
-          - vmware-keymaps
-          - nvm
           - listen1
           - 4kvideodownloaderplus
+          ######################################################
+          # Below are AUR packages that are depended by others #
+          ######################################################
+          - fvm # depby: hiddify
+          - clash-geoip # depby: mihomo
+          - wechat-bin # depby: wechat
+          - portable # depby: wechat
+          - wemeet-bin # depby: wemeet-wayland-screenshare-git
+          - nvm # depby: bilibili
+          - vmware-keymaps # depby: vmware-workstation
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -97,7 +100,7 @@ jobs:
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
           - bilibili # depon: nvm
-          - vmware-workstation # depon: vmware-keymaps
+          - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
     needs: build-stage-1
     runs-on: ubuntu-latest
     container: "archlinux:latest"
