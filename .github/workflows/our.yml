@@ -45,6 +45,7 @@ jobs:
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - nvm # depby: bilibili
           - vmware-keymaps # depby: vmware-workstation
+          - snapd-xdg-open-git # depby: linuxqq-nt-bwrap
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -100,6 +101,7 @@ jobs:
           - hiddify # depon: fvm
           - mihomo # depon: clash-geoip
           - wechat # depon: wechat-bin, portable
+          - linuxqq-nt-bwrap # depon: snapd-xdg-open-git
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
           - bilibili # depon: nvm
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
