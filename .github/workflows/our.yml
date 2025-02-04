@@ -21,14 +21,12 @@ jobs:
           - udevil-git
           - pmount
           - mihomo-party
-          - clash2singbox-git
           - fcitx5-skin-fluentdark-git
           - fcitx5-skin-fluentlight-git
           - watt-toolkit-bin
           - hfd-git
           - wsl-open
           - wsl2-ssh-agent
-          - chatbox-bin
           - linuxqq
           - dingtalk-bin
           - listen1
@@ -38,14 +36,12 @@ jobs:
           ######################################################
           # Below are AUR packages that are depended by others #
           ######################################################
-          - fvm # depby: hiddify
           - clash-geoip # depby: mihomo
           - wechat-bin # depby: wechat
           - portable # depby: wechat
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - nvm # depby: bilibili
           - vmware-keymaps # depby: vmware-workstation
-          - snapd-xdg-open-git # depby: linuxqq-nt-bwrap
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -98,10 +94,8 @@ jobs:
           ############################################################
           # Below are AUR packages that depend on other AUR packages #
           ############################################################
-          - hiddify # depon: fvm
           - mihomo # depon: clash-geoip
           - wechat # depon: wechat-bin, portable
-          - linuxqq-nt-bwrap # depon: snapd-xdg-open-git
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
           - bilibili # depon: nvm
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
