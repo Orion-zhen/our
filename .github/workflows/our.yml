@@ -28,7 +28,6 @@ jobs:
           - wsl-open
           - wsl2-ssh-agent
           - linuxqq
-          - dingtalk-bin
           - listen1
           - 4kvideodownloaderplus
           - feeluown-download
@@ -42,6 +41,7 @@ jobs:
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - nvm # depby: bilibili
           - vmware-keymaps # depby: vmware-workstation
+          - execstack # depby: dingtalk-bin
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -97,6 +97,7 @@ jobs:
           - mihomo # depon: clash-geoip
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
+          - dingtalk-bin # depon: execstack
           - bilibili # depon: nvm
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
     needs: build-stage-1
