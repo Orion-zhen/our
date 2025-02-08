@@ -32,6 +32,7 @@ jobs:
           - 4kvideodownloaderplus
           - feeluown-download
           - cherry-studio-bin
+          - tldr++
           ######################################################
           # Below are AUR packages that are depended by others #
           ######################################################
