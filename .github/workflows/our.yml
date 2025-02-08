@@ -39,7 +39,6 @@ jobs:
           - wechat-bin # depby: wechat
           - portable # depby: wechat
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
-          - nvm # depby: bilibili
           - vmware-keymaps # depby: vmware-workstation
           - execstack # depby: dingtalk-bin
       fail-fast: false
@@ -98,7 +97,6 @@ jobs:
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
           - dingtalk-bin # depon: execstack
-          - bilibili # depon: nvm
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
     needs: build-stage-1
     runs-on: ubuntu-latest
