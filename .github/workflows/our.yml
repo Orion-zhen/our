@@ -42,6 +42,7 @@ jobs:
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - vmware-keymaps # depby: vmware-workstation
           - execstack # depby: dingtalk-bin
+          - httpdirfs # depby: ttf-ms-win11-auto
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
