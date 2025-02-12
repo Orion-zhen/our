@@ -99,6 +99,7 @@ jobs:
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
           - dingtalk-bin # depon: execstack
+          - ttf-ms-win11-auto # depon: httpdirfs
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
     needs: build-stage-1
     runs-on: ubuntu-latest
