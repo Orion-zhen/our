@@ -24,7 +24,6 @@ jobs:
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - vmware-keymaps # depby: vmware-workstation
           - execstack # depby: dingtalk-bin
-          - httpdirfs # depby: ttf-ms-win11-auto
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -81,7 +80,6 @@ jobs:
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin
           - dingtalk-bin # depon: execstack
-          - ttf-ms-win11-auto # depon: httpdirfs
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
     needs: build-stage-1
     runs-on: ubuntu-latest
@@ -114,6 +112,13 @@ jobs:
       - name: Download built packages
         uses: actions/download-artifact@v4.1.8
         with:
+          name: |
+            clash-geoip
+            wechat-bin
+            portable
+            wemeet-bin
+            execstack
+            vmware-keymaps
           path: x86_64
           merge-multiple: true
 
@@ -183,6 +188,8 @@ jobs:
       - name: Download built packages
         uses: actions/download-artifact@v4.1.8
         with:
+          name: |
+            vmware-workstation
           path: x86_64
           merge-multiple: true
 
