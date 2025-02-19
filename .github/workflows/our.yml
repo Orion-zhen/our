@@ -22,6 +22,7 @@ jobs:
           - wechat-bin # depby: wechat
           - portable # depby: wechat
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
+          - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
           - vmware-keymaps # depby: vmware-workstation
           - execstack # depby: dingtalk-bin
       fail-fast: false
@@ -78,7 +79,7 @@ jobs:
           ############################################################
           - mihomo # depon: clash-geoip
           - wechat # depon: wechat-bin, portable
-          - wemeet-wayland-screenshare-git # depon: wemeet-bin
+          - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
           - dingtalk-bin # depon: execstack
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
     needs: build-stage-1
