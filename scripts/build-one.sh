@@ -10,7 +10,7 @@ if command -v yay &> /dev/null; then
     yay -S --noconfirm $(grep -Po '(?<=^depends=\().*?(?=\))' PKGBUILD | tr -d "'")
 fi
 
-makepkg -scfL --noconfirm --noprogressbar --sign --key $GPG_SIG_KEY
+makepkg -scfL --noconfirm --noprogressbar --sign --key $GPG_SIG_KEY --overwrite "*"
 rm -rf *-debug-*
 
 if ! mv "$ROOT_DIR/$repo/"*.pkg.tar.zst* $ROOT_DIR/ 2>/dev/null; then
