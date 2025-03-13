@@ -77,7 +77,7 @@ jobs:
           ############################################################
           # Below are AUR packages that depend on other AUR packages #
           ############################################################
-          - mihomo # depon: clash-geoip
+          - mihomo # depon: clash-geoip | depby: clash-nyanpasu-bin
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
           - dingtalk-bin # depon: execstack
@@ -151,6 +151,7 @@ jobs:
           # Below are AUR packages that depend on Stage 2 AUR packages #
           ##############################################################
           - vmware-unlocker # depon: vmware-workstation
+          - clash-nyanpasu-bin # depon: mihomo
     needs: build-stage-2
     runs-on: ubuntu-latest
     container: "archlinux:latest"
