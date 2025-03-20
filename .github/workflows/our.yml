@@ -25,6 +25,7 @@ jobs:
           - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
           - vmware-keymaps # depby: vmware-workstation
           - execstack # depby: dingtalk-bin
+          - ckbcomp # depby: calamares-git
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
