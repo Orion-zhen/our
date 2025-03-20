@@ -3,7 +3,9 @@
 export ROOT_DIR=$(pwd)
 export repo=$1
 
-git clone "https://aur.archlinux.org/${repo}.git"
+if ! test -f "$ROOT_DIR/$repo/PKGBUILD"; then
+    git clone "https://aur.archlinux.org/${repo}.git"
+fi
 cd "$ROOT_DIR/$repo"
 
 if command -v yay &> /dev/null; then
