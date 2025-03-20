@@ -8,6 +8,7 @@ cd "$ROOT_DIR/$repo"
 
 if command -v yay &> /dev/null; then
     yay -S --noconfirm $(grep -Po '(?<=^depends=\().*?(?=\))' PKGBUILD | tr -d "'")
+    yay -S --noconfirm $(grep -Po '(?<=^makedepends=\().*?(?=\))' PKGBUILD | tr -d "'")
 fi
 
 makepkg -scfL --noconfirm --noprogressbar --sign --key $GPG_SIG_KEY --skippgpcheck
