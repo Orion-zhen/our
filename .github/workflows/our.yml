@@ -83,6 +83,7 @@ jobs:
           - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
           - dingtalk-bin # depon: execstack
           - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
+          - calamares-git # depon: ckbcomp
     needs: build-stage-1
     runs-on: ubuntu-latest
     container: "archlinux:latest"
