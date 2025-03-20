@@ -4,11 +4,12 @@ export ROOT_DIR=$(pwd)
 export REPO=$1
 
 if test -f "$ROOT_DIR/ourpkg/$REPO/PKGBUILD"; then
-    cd "$ROOT_DIR/ourpkg/$REPO"
+    export WORK_DIR="$ROOT_DIR/ourpkg/$REPO"
 else
     git clone "https://aur.archlinux.org/$REPO.git"
-    cd "$ROOT_DIR/$REPO"
+    export WORK_DIR="$ROOT_DIR/$REPO"
 fi
+cd "$WORK_DIR"
 
 if command -v yay &>/dev/null; then
     yay -S --noconfirm $(grep -Po '(?<=^depends=\().*?(?=\))' PKGBUILD | tr -d "'")
@@ -18,10 +19,10 @@ fi
 makepkg -scfL --noconfirm --noprogressbar --sign --key $GPG_SIG_KEY --skippgpcheck
 rm -rf *-debug-*
 
-if ! mv $ROOT_DIR/$REPO/*.pkg.tar.zst* $ROOT_DIR/ 2>/dev/null; then
+if ! mv $WORK_DIR/*.pkg.tar.zst* $ROOT_DIR/ 2>/dev/null; then
     echo "Package not found: $REPO"
     exit 1
 fi
 
 cd "$ROOT_DIR"
-rm -rf "$ROOT_DIR/$REPO"
+rm -rf "$WORK_DIR"
