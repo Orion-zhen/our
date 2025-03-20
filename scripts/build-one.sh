@@ -4,7 +4,7 @@ export ROOT_DIR=$(pwd)
 export REPO=$1
 
 if ! test -f "$ROOT_DIR/$REPO/PKGBUILD"; then
-    git clone "https://aur.archlinux.org/${repo}.git"
+    git clone "https://aur.archlinux.org/${REPO}.git"
 fi
 cd "$ROOT_DIR/$REPO"
 
