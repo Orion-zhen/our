@@ -3,10 +3,12 @@
 export ROOT_DIR=$(pwd)
 export REPO=$1
 
-if ! test -f "$ROOT_DIR/ourpkg/$REPO/PKGBUILD"; then
+if test -f "$ROOT_DIR/ourpkg/$REPO/PKGBUILD"; then
+    cd "$ROOT_DIR/ourpkg/$REPO"
+else
     git clone "https://aur.archlinux.org/$REPO.git"
+    cd "$ROOT_DIR/$REPO"
 fi
-cd "$ROOT_DIR/$REPO"
 
 if command -v yay &>/dev/null; then
     yay -S --noconfirm $(grep -Po '(?<=^depends=\().*?(?=\))' PKGBUILD | tr -d "'")
