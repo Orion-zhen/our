@@ -3,12 +3,12 @@
 export ROOT_DIR=$(pwd)
 export REPO=$1
 
-if ! test -f "$ROOT_DIR/$REPO/PKGBUILD"; then
+if ! test -f "$ROOT_DIR/ourpkg/$REPO/PKGBUILD"; then
     git clone "https://aur.archlinux.org/$REPO.git"
 fi
 cd "$ROOT_DIR/$REPO"
 
-if command -v yay &> /dev/null; then
+if command -v yay &>/dev/null; then
     yay -S --noconfirm $(grep -Po '(?<=^depends=\().*?(?=\))' PKGBUILD | tr -d "'")
     yay -S --noconfirm $(grep -Po '(?<=^makedepends=\().*?(?=\))' PKGBUILD | tr -d "'")
 fi
