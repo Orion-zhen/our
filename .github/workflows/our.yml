@@ -23,7 +23,6 @@ jobs:
           - portable # depby: wechat
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
-          - vmware-keymaps # depby: vmware-workstation
           - execstack # depby: dingtalk-bin
           - ckbcomp # depby: calamares-git
       fail-fast: false
@@ -82,7 +81,6 @@ jobs:
           - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
           - dingtalk-bin # depon: execstack
-          - vmware-workstation # depon: vmware-keymaps | depby: vmware-unlocker
           - calamares-git # depon: ckbcomp
     needs: build-stage-1
     runs-on: ubuntu-latest
@@ -152,7 +150,6 @@ jobs:
           ##############################################################
           # Below are AUR packages that depend on Stage 2 AUR packages #
           ##############################################################
-          - vmware-unlocker # depon: vmware-workstation
           - clash-nyanpasu-bin # depon: mihomo
     needs: build-stage-2
     runs-on: ubuntu-latest
@@ -233,7 +230,6 @@ jobs:
           - wsl2-ssh-agent
           - linuxqq
           - listen1
-          - 4kvideodownloaderplus
           - feeluown-download
           - cherry-studio-bin
           - tldr++
