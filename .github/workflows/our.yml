@@ -231,8 +231,8 @@ jobs:
           - linuxqq
           - listen1
           - feeluown-download
-          - cherry-studio-bin
           - ascii-image-converter
+          - toolong
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
