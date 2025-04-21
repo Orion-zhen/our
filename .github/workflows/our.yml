@@ -232,7 +232,7 @@ jobs:
           - listen1
           - feeluown-download
           - cherry-studio-bin
-          - tldr++
+          - ascii-image-converter
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
