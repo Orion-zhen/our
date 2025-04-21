@@ -233,6 +233,7 @@ jobs:
           - feeluown-download
           - ascii-image-converter
           - toolong
+          - nali-nt-git
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
