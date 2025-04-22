@@ -15,7 +15,6 @@ If you want some nice packages in AUR, just feel free to issue 🤗
   - [x] Social Apps: [linuxqq](https://aur.archlinux.org/packages/linuxqq), [wechat](https://aur.archlinux.org/packages/wechat), [wemeet-bin](https://aur.archlinux.org/packages/wemeet-bin), [dingtalk-bin](https://aur.archlinux.org/packages/dingtalk-bin), etc.
   - [x] Media Apps: [listen1](https://aur.archlinux.org/packages/listen1), [4kvideodownloaderplus](https://aur.archlinux.org/packages/4kvideodownloaderplus), etc.
   - [x] Proxy tools: [mihomo](https://aur.archlinux.org/packages/mihomo), [hiddify](https://aur.archlinux.org/packages/hiddify), [watt-toolkit-bin](https://aur.archlinux.org/packages/watt-toolkit-bin), etc.
-  - [x] Powerful Apps: [vmware-workstation](https://aur.archlinux.org/packages/vmware-workstation), [cherry-studio-bin](https://aur.archlinux.org/packages/cherry-studio-bin), etc.
   - [x] And more to discover...
 - [x] Signed with my GPG key
 - [x] Built and released everyday to ensure the latest packages
