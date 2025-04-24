@@ -234,6 +234,7 @@ jobs:
           - ascii-image-converter
           - toolong
           - nali-nt-git
+          - deepchat
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
