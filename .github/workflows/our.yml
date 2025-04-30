@@ -25,6 +25,7 @@ jobs:
           - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
           - execstack # depby: dingtalk-bin
           - ckbcomp # depby: calamares-git
+          - unionfs-fuse # depby: flutter-bin
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -234,7 +235,6 @@ jobs:
           - ascii-image-converter
           - toolong
           - nali-nt-git
-          - deepchat
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
