@@ -19,7 +19,6 @@ jobs:
           # Below are AUR packages that are depended by others #
           ######################################################
           - clash-geoip # depby: mihomo
-          - wechat-bin # depby: wechat
           - portable # depby: wechat
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
@@ -79,9 +78,7 @@ jobs:
           # Below are AUR packages that depend on other AUR packages #
           ############################################################
           - mihomo # depon: clash-geoip | depby: clash-nyanpasu-bin
-          - wechat # depon: wechat-bin, portable
           - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
-          - dingtalk-bin # depon: execstack
           - calamares-git # depon: ckbcomp
     needs: build-stage-1
     runs-on: ubuntu-latest
@@ -220,7 +217,6 @@ jobs:
           - nodejs-gitmoji-cli
           - hiddify-next-bin
           - hyprland-interactive-screenshot
-          - udevil-git
           - pmount
           - mihomo-party
           - fcitx5-skin-fluentdark-git
@@ -229,7 +225,6 @@ jobs:
           - hfd-git
           - wsl-open
           - wsl2-ssh-agent
-          - linuxqq
           - listen1
           - feeluown-download
           - ascii-image-converter
