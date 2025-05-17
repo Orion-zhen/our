@@ -230,6 +230,7 @@ jobs:
           - ascii-image-converter
           - toolong
           - nali-nt-git
+          - envfetch
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
