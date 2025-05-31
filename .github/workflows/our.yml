@@ -31,7 +31,6 @@ jobs:
           - libastal-auth-git # depby: libastal-meta
           - libastal-battery-git # depby: libastal-meta
           - libastal-bluetooth-git # depby: libastal-meta
-          - libcava # depby: libastal-cava-git
           - libastal-greetd-git # depby: libastal-meta
           - libastal-hyprland-git # depby: libastal-meta
           - libastal-mpris-git # depby: libastal-meta
@@ -86,6 +85,74 @@ jobs:
           path: |
             *.zst*
 
+  build-stage-1-no-lto:
+    strategy:
+      matrix:
+        repos:
+          ###############################################################
+          # Below are AUR packages that are depended by others. No LTO! #
+          ###############################################################
+          - libcava # depby: libastal-cava-git
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Add tmp repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
   build-stage-2:
     strategy:
       matrix:
@@ -101,7 +168,9 @@ jobs:
           - libastal-4-git # depon: libastal-io-git | depby: libastal-meta
           - libastal-cava-git # depon: libcava | depby: libastal-meta
           - libastal-tray-git # depon: appmenu-glib-translator-git | depby: libastal-meta
-    needs: build-stage-1
+    needs: 
+      - build-stage-1
+      - build-stage-1-no-lto
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
