@@ -1,4 +1,3 @@
-# .github/workflows/main-orchestrator.yml
 name: OUR Publish Orchestrator
 
 on:
