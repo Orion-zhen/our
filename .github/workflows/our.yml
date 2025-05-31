@@ -34,13 +34,13 @@ jobs:
           - libastal-cava-git # depby: libastal-meta
           - libastal-greetd-git # depby: libastal-meta
           - libastal-hyprland-git # depby: libastal-meta
-          - libastal-mpris # depby: libastal-meta
-          - libastal-network # depby: libastal-meta
-          - libastal-notifd # depby: libastal-meta
-          - libastal-power-profiles # depby: libastal-meta
-          - libastal-river # depby: libastal-meta
-          - libastal-tray # depby: libastal-meta
-          - libastal-wireplumber # depby: libastal-meta
+          - libastal-mpris-git # depby: libastal-meta
+          - libastal-network-git # depby: libastal-meta
+          - libastal-notifd-git # depby: libastal-meta
+          - libastal-power-profiles-git # depby: libastal-meta
+          - libastal-river-git # depby: libastal-meta
+          - libastal-tray-git # depby: libastal-meta
+          - libastal-wireplumber-git # depby: libastal-meta
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
