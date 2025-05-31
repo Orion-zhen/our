@@ -48,19 +48,21 @@ jobs:
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-          echo "Listing contents of workspace:"
-          ls -R ${{ github.workspace }}
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
 
-          # Install dependencies downloaded by the meta-workflow
-          # The meta-workflow will place them in `${{ github.workspace }}/dependencies/`
-          if [ -d "${{ github.workspace }}/dependencies" ] && [ "$(ls -A ${{ github.workspace }}/dependencies/*.zst 2>/dev/null)" ]; then
-            echo "Installing downloaded dependencies from ${{ github.workspace }}/dependencies..."
-            pacman -U --noconfirm ${{ github.workspace }}/dependencies/*.pkg.tar.zst # Ensure pattern matches actual file names
-          else
-            echo "No dependencies found in ${{ github.workspace }}/dependencies or directory does not exist/is empty."
-            # Depending on strictness, you might want to `exit 1` here if deps are mandatory
-          fi
-          pacman -Syu --noconfirm --overwrite '*' # Refresh after adding local packages
+      - name: Add tmp repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
 
       - name: Build AUR packages
         env:
