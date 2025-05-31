@@ -1,0 +1,233 @@
+# .github/workflows/main-orchestrator.yml
+name: OUR Publish Orchestrator
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      # Trigger if orchestrator or any reusable workflow changes
+      - ".github/workflows/meta-build.yml"
+      - ".github/workflows/build-stage-*.yml"
+      # Or if scripts/configs change
+      - "scripts/**"
+      - "configs/**"
+
+jobs:
+  # STAGE 1 BUILDS
+  call-build-stage-1:
+    uses: ./.github/workflows/build-stage-1.yml
+    with:
+      makepkg_conf_file: "configs/makepkg.conf"
+    secrets: inherit # Or list them explicitly
+
+  call-build-stage-1-no-lto:
+    uses: ./.github/workflows/build-stage-1-no-lto.yml
+    with:
+      makepkg_conf_file: "configs/makepkg-no-lto.conf" # Specific matrix for no-lto packages
+    secrets: inherit
+
+  # INDEPENDENT BUILDS (can run in parallel with stage 1)
+  call-independent-build:
+    uses: ./.github/workflows/independent-build.yml
+    with:
+      makepkg_conf_file: "configs/makepkg.conf" # Or its own matrix if needed
+    secrets: inherit
+
+  # STAGE 2 BUILD
+  call-build-stage-2:
+    needs: 
+      - call-build-stage-1
+      - call-build-stage-1-no-lto
+    uses: ./.github/workflows/build-stage-2.yml
+    secrets: inherit
+    steps: # Steps in the meta-workflow job, not the reusable one
+      - name: Download Stage 1 and Stage 1 No-LTO artifacts
+        uses: actions/download-artifact@v4
+        with:
+          # No 'name' means download all artifacts from needy jobs if they produced them
+          # Or be specific if names are known and distinct
+          # For matrix jobs in reusable workflows, artifacts are named by matrix.repos
+          # Example: downloading specific known dependencies for stage 2
+          # If mihomo needs clash-geoip:
+          # - name: Download clash-geoip
+          #   uses: actions/download-artifact@v4
+          #   with:
+          #     name: clash-geoip # From call-build-stage-1
+          #     path: ${{ github.workspace }}/dependencies/
+          # If libastal-cava-git needs libcava:
+          # - name: Download libcava
+          #   uses: actions/download-artifact@v4
+          #   with:
+          #     name: libcava # From call-build-stage-1-no-lto
+          #     path: ${{ github.workspace }}/dependencies/
+          # General approach: Download all needed by this stage.
+          # The reusable workflow's matrix will build one package at a time,
+          # so it needs ALL potential dependencies for ANY of its matrix items.
+          path: ${{ github.workspace }}/dependencies/ # All artifacts go here
+          # The download action will create subdirectories if artifacts were uploaded that way.
+          # Since our reusable workflows upload *.zst directly with artifact name = package name,
+          # download-artifact will put them as:
+          # dependencies/clash-geoip/clash-geoip-version.pkg.tar.zst
+          # dependencies/portable/portable-version.pkg.tar.zst
+          # Let's adjust upload in reusable to avoid subdirs if preferred for easier pacman -U path/*
+          # If upload-artifact path is `foo.zst` (specific file), download gives `dependencies/foo.zst`
+          # If upload-artifact path is `*.zst` from a matrix, it might be tricky.
+          # Safest: each matrix job uploads artifact with name matrix.repo and path its one zst.
+          # Then download them one by one in meta, or by pattern if download-artifact supports it well.
+
+          # Let's assume upload-artifact creates one artifact per package, named as the package.
+          # Download all artifacts from the 'needs' context.
+          # This will download artifacts from call-build-stage-1 and call-build-stage-1-no-lto
+          # into subdirectories named after the artifacts.
+          # e.g. ${{ github.workspace }}/dependencies/clash-geoip/clash-geoip.pkg.tar.zst
+          # ${{ github.workspace }}/dependencies/libcava/libcava.pkg.tar.zst
+          # The reusable workflow's pacman -U command needs to handle this, e.g., find command.
+          # `find ${{ github.workspace }}/dependencies -name '*.pkg.tar.zst' -exec pacman -U --noconfirm {} +`
+
+  # STAGE 3 BUILD
+  call-build-stage-3:
+    needs: call-build-stage-2
+    uses: ./.github/workflows/build-stage-3.yml
+    secrets: inherit
+    steps:
+      - name: Download Stage 2 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ github.workspace }}/dependencies/
+
+  # STAGE 4 BUILD
+  call-build-stage-4:
+    needs: call-build-stage-3
+    uses: ./.github/workflows/build-stage-4.yml
+    secrets: inherit
+    steps:
+      - name: Download Stage 3 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ github.workspace }}/dependencies/
+
+  # STAGE 5 BUILD
+  call-build-stage-5:
+    needs: call-build-stage-4
+    uses: ./.github/workflows/build-stage-5.yml
+    secrets: inherit
+    steps:
+      - name: Download Stage 4 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ github.workspace }}/dependencies/
+
+  repo-add:
+    needs: 
+      - call-build-stage-5
+      - call-independent-build
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Generate repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our
+
+      - name: Upload repo.db
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: repo-db
+          path: |
+            x86_64/*.db*
+            x86_64/*.files*
+
+  publish-to-page:
+    needs: repo-add
+    concurrency:
+      group: publish-to-page
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Generate package index
+        run: |
+          python scripts/gen-index.py
+
+      - name: Setup pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  publish-to-hf:
+    needs: repo-add
+    concurrency:
+      group: publish-to-hf
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Release to huggingface
+        continue-on-error: true
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install -U huggingface_hub
+          huggingface-cli upload-large-folder --token $HF_TOKEN --repo-type model Orion-zhen/our . --no-bars

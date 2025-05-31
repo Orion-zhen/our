@@ -1,0 +1,82 @@
+# .github/workflows/build-stage-3.yml
+name: Build Stage 3
+
+on:
+  workflow_call:
+    secrets: # Define all secrets it needs
+      GPG_SEC_KEY:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+      GPG_SIG_KEY:
+        required: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        repos:
+          ##############################################################
+          # Below are AUR packages that depend on Stage 2 AUR packages #
+          ##############################################################
+          - clash-nyanpasu-bin # depon: mihomo
+          ### libastal series for hyprpanel ###
+          - libastal-meta # depby: aylurs-gtk-shell-git
+          - libastal-gjs-git # depon: libastal-git | depby: aylurs-gtk-shell-git
+      fail-fast: false
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write # if checkout is needed
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment and Install Dependencies
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf # Assuming default conf here
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+          echo "Listing contents of workspace:"
+          ls -R ${{ github.workspace }}
+
+          # Install dependencies downloaded by the meta-workflow
+          # The meta-workflow will place them in `${{ github.workspace }}/dependencies/`
+          if [ -d "${{ github.workspace }}/dependencies" ] && [ "$(ls -A ${{ github.workspace }}/dependencies/*.zst 2>/dev/null)" ]; then
+            echo "Installing downloaded dependencies from ${{ github.workspace }}/dependencies..."
+            pacman -U --noconfirm ${{ github.workspace }}/dependencies/*.pkg.tar.zst # Ensure pattern matches actual file names
+          else
+            echo "No dependencies found in ${{ github.workspace }}/dependencies or directory does not exist/is empty."
+            # Depending on strictness, you might want to `exit 1` here if deps are mandatory
+          fi
+          pacman -Syu --noconfirm --overwrite '*' # Refresh after adding local packages
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.repos }} # Artifact name is the repo name
+          path: |
+            *.pkg.tar.zst
+            *.pkg.tar.zst.sig
+          retention-days: 7

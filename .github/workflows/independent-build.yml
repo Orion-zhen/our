@@ -1,0 +1,78 @@
+# .github/workflows/build-stage-1.yml
+name: Build Stage 1
+
+on:
+  workflow_call:
+    secrets:
+      GPG_SEC_KEY:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+      GPG_SIG_KEY:
+        required: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        repos:
+          - nodejs-gitmoji-cli
+          - hiddify-next-bin
+          - hyprland-interactive-screenshot
+          - pmount
+          - mihomo-party
+          - fcitx5-skin-fluentdark-git
+          - fcitx5-skin-fluentlight-git
+          - watt-toolkit-bin
+          - hfd-git
+          - wsl-open
+          - wsl2-ssh-agent
+          - listen1
+          - feeluown-download
+          - ascii-image-converter
+          - toolong
+          - nali-nt-git
+          - envfetch
+      fail-fast: false
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write # If checkout is needed, otherwise can be read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.repos }} # Artifact name is the repo name
+          path: |
+            *.pkg.tar.zst
+            *.pkg.tar.zst.sig
+          retention-days: 7 # Keep artifacts for a reasonable time
