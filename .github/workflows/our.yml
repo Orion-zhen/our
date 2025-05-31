@@ -438,7 +438,7 @@ jobs:
 
   repo-add:
     needs: 
-      - build-stage-3
+      - build-stage-5
       - independent-build
     runs-on: ubuntu-latest
     container: "archlinux:latest"
