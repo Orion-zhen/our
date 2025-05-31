@@ -25,6 +25,22 @@ jobs:
           - execstack # depby: dingtalk-bin
           - ckbcomp # depby: calamares-git
           - unionfs-fuse # depby: flutter-bin
+          ### libastal series for hyprpanel ###
+          - libastal-io-git # depby: libastal-git, libastal-4-git, libastal-meta
+          - libastal-apps-git # depby: libastal-meta
+          - libastal-auth-git # depby: libastal-meta
+          - libastal-battery-git # depby: libastal-meta
+          - libastal-bluetooch-git # depby: libastal-meta
+          - libastal-cava-git # depby: libastal-meta
+          - libastal-greetd-git # depby: libastal-meta
+          - libastal-hyprland-git # depby: libastal-meta
+          - libastal-mpris # depby: libastal-meta
+          - libastal-network # depby: libastal-meta
+          - libastal-notifd # depby: libastal-meta
+          - libastal-power-profiles # depby: libastal-meta
+          - libastal-river # depby: libastal-meta
+          - libastal-tray # depby: libastal-meta
+          - libastal-wireplumber # depby: libastal-meta
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -80,6 +96,9 @@ jobs:
           - mihomo # depon: clash-geoip | depby: clash-nyanpasu-bin
           - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
           - calamares-git # depon: ckbcomp
+          ### libastal series for hyprpanel ###
+          - libastal-git # depon: libastal-io-git | depby: libastal-meta, libastal-gjs-git
+          - libastal-4-git # depon: libastal-io-git | depby: libastal-meta
     needs: build-stage-1
     runs-on: ubuntu-latest
     container: "archlinux:latest"
@@ -149,7 +168,148 @@ jobs:
           # Below are AUR packages that depend on Stage 2 AUR packages #
           ##############################################################
           - clash-nyanpasu-bin # depon: mihomo
+          ### libastal series for hyprpanel ###
+          - libastal-meta # depby: aylurs-gtk-shell-git
+          - libastal-gjs-git # depon: libastal-git | depby: aylurs-gtk-shell-git
     needs: build-stage-2
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Add tmp repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
+  build-stage-4:
+    strategy:
+      matrix:
+        repos:
+          ##############################################################
+          # Below are AUR packages that depend on Stage 3 AUR packages #
+          ##############################################################
+          - aylurs-gtk-shell-git # depon: libastal-gjs-git, libastal-meta | depby: ags-hyprpanel-git
+    needs: build-stage-3
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4.1.8
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Add tmp repo db
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
+  build-stage-5:
+    strategy:
+      matrix:
+        repos:
+          ##############################################################
+          # Below are AUR packages that depend on Stage 4 AUR packages #
+          ##############################################################
+          - ags-hyprpanel-git # depon: aylurs-gtk-shell-git
+    needs: build-stage-4
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
