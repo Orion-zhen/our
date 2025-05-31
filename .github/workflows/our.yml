@@ -30,7 +30,7 @@ jobs:
           - libastal-apps-git # depby: libastal-meta
           - libastal-auth-git # depby: libastal-meta
           - libastal-battery-git # depby: libastal-meta
-          - libastal-bluetooch-git # depby: libastal-meta
+          - libastal-bluetooth-git # depby: libastal-meta
           - libastal-cava-git # depby: libastal-meta
           - libastal-greetd-git # depby: libastal-meta
           - libastal-hyprland-git # depby: libastal-meta
