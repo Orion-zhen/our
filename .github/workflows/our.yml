@@ -120,22 +120,6 @@ jobs:
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Add tmp repo db
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/repo-add.sh our-tmp
-          echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
-          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*'
-
       - name: Build AUR packages
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
