@@ -18,7 +18,6 @@ jobs:
           ######################################################
           # Below are AUR packages that are depended by others #
           ######################################################
-          - clash-geoip # depby: mihomo
           - portable # depby: wechat
           - wemeet-bin # depby: wemeet-wayland-screenshare-git
           - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
@@ -144,7 +143,6 @@ jobs:
           ############################################################
           # Below are AUR packages that depend on other AUR packages #
           ############################################################
-          - mihomo # depon: clash-geoip | depby: clash-nyanpasu-bin
           - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
           - calamares-git # depon: ckbcomp
           ### libastal series for hyprpanel ###
@@ -222,7 +220,6 @@ jobs:
           ##############################################################
           # Below are AUR packages that depend on Stage 2 AUR packages #
           ##############################################################
-          - clash-nyanpasu-bin # depon: mihomo
           ### libastal series for hyprpanel ###
           - libastal-meta # depby: aylurs-gtk-shell-git
           - libastal-gjs-git # depon: libastal-git | depby: aylurs-gtk-shell-git
