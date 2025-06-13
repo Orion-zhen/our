@@ -488,10 +488,61 @@ jobs:
           path: |
             *.zst*
 
+  independent-build-no-lto:
+    strategy:
+      matrix:
+        repos:
+          - wezterm-git
+      fail-fast: false
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      #   - name: Free disk space (Ubuntu)
+      #     uses: jlumbroso/free-disk-space@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ matrix.repos }}
+
+      - name: Rename illigal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ matrix.repos }}
+          path: |
+            *.zst*
+
   repo-add:
     needs: 
       - build-stage-5
       - independent-build
+      - independent-build-no-lto
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
