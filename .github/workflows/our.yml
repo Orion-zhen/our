@@ -445,6 +445,7 @@ jobs:
           - envfetch
           - nautilus-admin-gtk4
           - hyprls-git
+          - hyprshot-gui
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
