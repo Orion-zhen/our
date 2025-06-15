@@ -40,19 +40,17 @@ jobs:
               toolong nali-nt-git envfetch nautilus-admin-gtk4 hyprls-git
               hyprshot-gui matugen-git clipse-git
             makepkg_conf: ./configs/makepkg.conf
-            download-artifacts: false
           # No-LTO builds
           - name: base-no-lto
             packages: >-
               libcava wezterm-git
             makepkg_conf: ./configs/makepkg-no-lto.conf
-            download-artifacts: false
     uses: ./.github/workflows/reusable-build.yml
     with:
       packages: ${{ matrix.packages }}
       makepkg-conf: ${{ matrix.makepkg_conf }}
       artifact-name: packages-${{ matrix.name }}
-      download-artifacts: true
+      download-artifacts: false
     secrets: inherit # Pass all secrets to the reusable workflow
 
   #####################################################################
