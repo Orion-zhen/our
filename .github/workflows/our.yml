@@ -248,7 +248,10 @@ jobs:
 
   publish-to-hf:
     name: Publish to Hugging Face
-    needs: stage-2
+    needs: # This transitively depends on all previous stages
+      - standalone
+      - standalone-no-lto
+      - stage-2
     runs-on: ubuntu-latest
     steps:
       - name: Download all built packages
