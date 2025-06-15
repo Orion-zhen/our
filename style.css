@@ -195,16 +195,16 @@ p>code {
     background-color: var(--accent-color-hover);
 }
 
+/* 我们还需要为 package-list 添加 perspective 属性，为子元素的3D变换提供舞台 */
 .package-list {
     display: grid;
-    /* 使用 Grid 布局 */
     grid-auto-flow: column;
-    /* 让网格内容横向流动，实现横向滚动 */
     grid-template-rows: repeat(3, 1fr);
-    /* 创建三行，高度平分 */
     gap: 1rem;
     width: max-content;
     padding: 0.5rem 2px;
+    perspective: 1500px;
+    /* 定义3D舞台的视深 */
 }
 
 .loading-text {
@@ -217,20 +217,41 @@ p>code {
     justify-content: space-between;
     width: 280px;
     height: 140px;
-    /* 如果行高不一致，可以设为 min-height */
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1rem;
     text-decoration: none;
-    /* 移除之前的 transform 过渡，因为动画将处理它 */
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    /* 默认状态下，为所有属性设置过渡 */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+
+    transform-style: preserve-3d;
+}
+
+/* NEW: 当卡片处于交互状态时，禁用 transform 的过渡 */
+.package-card.is-interacting {
+    transition: box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    /* transition-property: box-shadow, border-color; 也是一种写法 */
 }
 
 .package-card:hover {
-    /* 保持悬停效果，但不改变 transform */
+    /* JS会处理transform，但我们保留其他悬停效果 */
     border-color: var(--accent-color);
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+    /* 关键：移除悬停时的下划线 */
+    text-decoration: none;
+}
+
+/* 确保卡片内的所有文字颜色在悬停时也不变 */
+.package-card:hover,
+.package-card:hover .package-name,
+.package-card:hover .package-meta {
+    color: inherit;
+    /* 继承自身颜色，防止a:hover全局样式影响 */
 }
 
 .package-name {
@@ -263,40 +284,21 @@ p>code {
     border-radius: 4px;
     font-weight: 500;
     font-family: var(--font-mono);
+    /* 关键：背景色由一个CSS变量决定，默认为灰色 */
+    background-color: var(--size-bg-color, #3f3f46);
+    /* 文本颜色也由变量决定，确保可读性 */
+    color: var(--size-text-color, var(--text-primary));
+    transition: background-color 0.3s ease;
+    /* 让颜色变化更平滑 */
 }
-
-/* 根据文件大小的条件化样式 */
-.size-b {
-    background-color: #3f3f46;
-    color: #f4f4f5;
-}
-
-.size-kb {
-    background-color: #164e63;
-    color: #cffafe;
-}
-
-/* 青色系 */
-.size-mb {
-    background-color: #7c2d12;
-    color: #ffedd5;
-}
-
-/* 橙色系 */
-.size-gb {
-    background-color: #7f1d1d;
-    color: #fee2e2;
-}
-
-/* 红色系 */
 
 /* --- 5. Scroll Animation --- */
 /* 5.1 Section Fade-in Animation (保持不变) */
 /* 
-    准备应用动画的元素。
-    初始状态：向下平移20px，完全透明。
-    opacity 和 transform 属性将会被过渡。
-    贝塞尔曲线 ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1) 提供了一个快速开始、然后平滑减速的效果，非常优雅。
+* 准备应用动画的元素。
+* 初始状态：向下平移20px，完全透明。
+* opacity 和 transform 属性将会被过渡。
+* 贝塞尔曲线 ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1) 提供了一个快速开始、然后平滑减速的效果，非常优雅。
 */
 .fade-in-up {
     opacity: 0;
@@ -306,8 +308,8 @@ p>code {
 }
 
 /* 
-  当元素进入视口时，JS 会为其添加 .visible 类。
-  最终状态：完全不透明，回到原始位置（transform被重置）。
+* 当元素进入视口时，JS 会为其添加 .visible 类。
+* 最终状态：完全不透明，回到原始位置（transform被重置）。
 */
 .fade-in-up.visible {
     opacity: 1;
@@ -356,4 +358,60 @@ p>code {
 .card-fly-in.visible {
     opacity: 1;
     transform: translateX(0) translateY(0);
+}
+
+/* --- 6. Code Block Copy Button --- */
+
+/* 确保 <pre> 标签是按钮的定位父级 */
+pre {
+    position: relative;
+    /* 为按钮留出一些内边距空间 */
+    padding-top: 2.5rem;
+}
+
+.copy-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    opacity: 0.7;
+
+    /* 平滑的过渡效果 */
+    transition: all 0.2s ease-in-out;
+}
+
+.copy-button:hover {
+    opacity: 1;
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* 点击反馈的“已复制”状态 */
+.copy-button.copied {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    /* 用深色背景以获得高对比度 */
+    transform: scale(1.05);
+    /* 轻微放大，形成“pop”效果 */
+    border-color: var(--accent-color);
+    opacity: 1;
+}
+
+/* 按钮内的SVG图标样式 */
+.copy-button svg {
+    width: 1em;
+    height: 1em;
+    stroke-width: 2;
 }
