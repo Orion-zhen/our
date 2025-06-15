@@ -1,22 +1,20 @@
+# File: .github/workflows/reusable-build.yml
+# 这个文件不需要改动，它已经很好了。
 name: Reusable AUR Build
 
 on:
   workflow_call:
     inputs:
-      packages:
-        description: 'A space-separated string of packages to build'
+      package:
+        description: 'The package to build'
         required: true
         type: string
       makepkg-conf:
         description: 'Path to the makepkg.conf file to use'
         required: true
         type: string
-      artifact-name:
-        description: 'Name for the uploaded artifact'
-        required: true
-        type: string
       download-artifacts:
-        description: 'Whether to download artifacts from previous jobs in this workflow run'
+        description: 'Whether to download artifacts from previous jobs'
         required: true
         type: boolean
     secrets:
@@ -29,16 +27,13 @@ on:
 
 jobs:
   build:
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     container: "archlinux:latest"
-    # The 'permissions' for this job are now granted by the caller.
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ... (其他步骤如 import gpg, prepare env) ...
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         with:
@@ -51,43 +46,42 @@ jobs:
           cat ${{ inputs.makepkg-conf }} >> /etc/makepkg.conf
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Download previously built dependencies (if any exist)
+      
+      - name: Download previously built dependencies
         if: ${{ inputs.download-artifacts }}
-        id: download-deps # Give this step an ID to reference its outputs
+        id: download-deps
         uses: actions/download-artifact@v4
         with:
           path: x86_64
           merge-multiple: true
 
-      - name: Setup local repo for dependencies (if needed)
-        # CORRECTED: This condition is now valid. It checks the output of the download step.
+      - name: Setup local repo for dependencies
         if: ${{ inputs.download-artifacts && steps.download-deps.outputs.download-path }}
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
           echo "--- Setting up local repo with downloaded packages ---"
-          ls -R x86_64 # Optional: See what was downloaded
           bash scripts/repo-add.sh our-tmp
           echo "[our-tmp]" >> /etc/pacman.conf
           echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
           echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
           pacman -Syu --noconfirm --overwrite '*'
-        id: setup-repo
 
-      - name: Build AUR packages
+      - name: Build AUR package
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        # 调用脚本，只传递一个包
         run: |
-          bash scripts/build-one.sh ${{ inputs.packages }}
+          bash scripts/build-one.sh ${{ inputs.package }}
 
+      # ... (Rename and Upload steps) ...
       - name: Rename files with illegal characters
         run: |
           find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
+      
+      - name: Upload built package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.artifact-name }}
+          name: ${{ inputs.package }} # 使用包名作为构件名，更清晰
           path: |
             *.zst*
