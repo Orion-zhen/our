@@ -11,6 +11,10 @@ on:
         description: "Enable LTO"
         default: true
         type: boolean
+      clean-build:
+        description: "Build without any extra config"
+        default: false
+        type: boolean
 
 jobs:
   test-build:
@@ -24,7 +28,7 @@ jobs:
           lfs: false
 
       - name: Prepare environment
-        if: ${{ inputs.lto }}
+        if: ${{ inputs.lto && !inputs.clean-build }}
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
@@ -32,12 +36,19 @@ jobs:
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-      - name: Prepare environment
-        if: ${{ !inputs.lto }}
+      - name: Prepare environment (No LTO)
+        if: ${{ !inputs.lto && !inputs.clean-build }}
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Prepare environment (Clean Build)
+        if: ${{ inputs.clean-build }}
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
