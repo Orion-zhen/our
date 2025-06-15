@@ -14,98 +14,146 @@ on:
       - 'configs/**'
 
 jobs:
-  #####################################################################
-  # STAGE 1: Build packages with no AUR dependencies.
-  # This combines the original 'build-stage-1' and 'independent-build'.
-  #####################################################################
   build-stage-1:
-    permissions:
-      contents: write
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # LTO enabled builds
-          - name: base-lto
-            packages: >-
-              portable wemeet-bin xwaylandvideobridge execstack ckbcomp
-              unionfs-fuse libastal-io-git libastal-apps-git libastal-auth-git
-              libastal-battery-git libastal-bluetooth-git libastal-greetd-git
-              libastal-hyprland-git libastal-mpris-git libastal-network-git
-              libastal-notifd-git appmenu-glib-translator-git libastal-powerprofiles-git
-              libastal-river-git libastal-wireplumber-git nodejs-gitmoji-cli hiddify-next-bin
-              hyprland-interactive-screenshot pmount mihomo-party fcitx5-skin-fluentdark-git
-              fcitx5-skin-fluentlight-git watt-toolkit-bin hfd-git wsl-open
-              wsl2-ssh-agent listen1 feeluown-download ascii-image-converter
-              toolong nali-nt-git envfetch nautilus-admin-gtk4 hyprls-git
-              hyprshot-gui matugen-git clipse-git
-            makepkg_conf: ./configs/makepkg.conf
-          # No-LTO builds
-          - name: base-no-lto
-            packages: >-
-              libcava wezterm-git
-            makepkg_conf: ./configs/makepkg-no-lto.conf
+        # LTO-enabled packages
+        package:
+          - portable 
+          - wemeet-bin 
+          - xwaylandvideobridge 
+          - execstack 
+          - ckbcomp 
+          - unionfs-fuse
+          - libastal-io-git 
+          - libastal-apps-git 
+          - libastal-auth-git
+          - libastal-battery-git 
+          - libastal-bluetooth-git 
+          - libastal-greetd-git
+          - libastal-hyprland-git 
+          - libastal-mpris-git 
+          - libastal-network-git
+          - libastal-notifd-git 
+          - appmenu-glib-translator-git 
+          - libastal-powerprofiles-git
+          - libastal-river-git 
+          - libastal-wireplumber-git
+          # Independent packages merged here
+          - nodejs-gitmoji-cli
+          - hiddify-next-bin
+          - hyprland-interactive-screenshot
+          - pmount
+          - mihomo-party
+          - fcitx5-skin-fluentdark-git
+          - fcitx5-skin-fluentlight-git
+          - watt-toolkit-bin
+          - hfd-git
+          - wsl-open
+          - wsl2-ssh-agent
+          - listen1
+          - feeluown-download
+          - ascii-image-converter
+          - toolong
+          - nali-nt-git
+          - envfetch
+          - nautilus-admin-gtk4
+          - hyprls-git
+          - hyprshot-gui
+          - matugen-git
+          - clipse-git
     uses: ./.github/workflows/reusable-build.yml
-    with:
-      packages: ${{ matrix.packages }}
-      makepkg-conf: ${{ matrix.makepkg_conf }}
-      artifact-name: packages-${{ matrix.name }}
-      download-artifacts: false
-    secrets: inherit # Pass all secrets to the reusable workflow
-
-  #####################################################################
-  # STAGE 2-5: Build packages with dependencies on previous stages.
-  #####################################################################
-  build-stage-2:
     permissions:
       contents: write
-    needs: build-stage-1
-    uses: ./.github/workflows/reusable-build.yml
     with:
-      packages: >-
-        wemeet-wayland-screenshare-git calamares-git libastal-git
-        libastal-4-git libastal-cava-git libastal-tray-git
+      package: ${{ matrix.package }}
       makepkg-conf: ./configs/makepkg.conf
-      artifact-name: packages-stage-2
+      download-artifacts: false
+    secrets: inherit
+
+  build-stage-1-no-lto:
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - libcava
+          - wezterm-git
+    uses: ./.github/workflows/reusable-build.yml
+    permissions:
+      contents: write
+    with:
+      package: ${{ matrix.package }}
+      makepkg-conf: ./configs/makepkg-no-lto.conf
+      download-artifacts: false
+    secrets: inherit
+
+  build-stage-2:
+    needs: [build-stage-1, build-stage-1-no-lto] # Depend on both LTO and no-LTO groups
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - wemeet-wayland-screenshare-git
+          - calamares-git
+          - libastal-git
+          - libastal-4-git
+          - libastal-cava-git
+          - libastal-tray-git
+    uses: ./.github/workflows/reusable-build.yml
+    permissions:
+      contents: write
+    with:
+      package: ${{ matrix.package }}
+      makepkg-conf: ./configs/makepkg.conf
       download-artifacts: true
     secrets: inherit
 
+  # ... Stage 3, 4, 5 follow the same pattern ...
+
   build-stage-3:
-    permissions:
-      contents: write
     needs: build-stage-2
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - libastal-meta
+          - libastal-gjs-git
     uses: ./.github/workflows/reusable-build.yml
+    permissions: { contents: write }
     with:
-      packages: >-
-        libastal-meta libastal-gjs-git
+      package: ${{ matrix.package }}
       makepkg-conf: ./configs/makepkg.conf
-      artifact-name: packages-stage-3
       download-artifacts: true
     secrets: inherit
 
   build-stage-4:
-    permissions:
-      contents: write
     needs: build-stage-3
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - aylurs-gtk-shell-git
     uses: ./.github/workflows/reusable-build.yml
+    permissions: { contents: write }
     with:
-      packages: >-
-        aylurs-gtk-shell-git
+      package: ${{ matrix.package }}
       makepkg-conf: ./configs/makepkg.conf
-      artifact-name: packages-stage-4
       download-artifacts: true
     secrets: inherit
 
   build-stage-5:
-    permissions:
-      contents: write
     needs: build-stage-4
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - ags-hyprpanel-git
     uses: ./.github/workflows/reusable-build.yml
+    permissions: { contents: write }
     with:
-      packages: >-
-        ags-hyprpanel-git
+      package: ${{ matrix.package }}
       makepkg-conf: ./configs/makepkg.conf
-      artifact-name: packages-stage-5
       download-artifacts: true
     secrets: inherit
 
