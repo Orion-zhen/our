@@ -163,6 +163,7 @@ jobs:
     name: Publish to Pages
     needs: build-stage-2 # This transitively depends on all previous stages
     runs-on: ubuntu-latest
+    container: "archlinux:latest"
     permissions:
       contents: write
       pages: write
