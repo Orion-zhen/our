@@ -446,6 +446,7 @@ jobs:
           - nautilus-admin-gtk4
           - hyprls-git
           - hyprshot-gui
+          - matugen-git
       fail-fast: false
     runs-on: ubuntu-latest
     container: "archlinux:latest"
