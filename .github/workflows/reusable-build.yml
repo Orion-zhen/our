@@ -15,6 +15,10 @@ on:
         description: 'Name for the uploaded artifact'
         required: true
         type: string
+      download-artifacts:
+        description: 'Whether to download artifacts from previous jobs in this workflow run'
+        required: true
+        type: boolean
     secrets:
       GPG_SEC_KEY:
         required: true
@@ -49,6 +53,7 @@ jobs:
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Download previously built dependencies (if any exist)
+        if: ${{ inputs.download-artifacts }}
         id: download-deps # Give this step an ID to reference its outputs
         uses: actions/download-artifact@v4
         with:
@@ -57,12 +62,12 @@ jobs:
 
       - name: Setup local repo for dependencies (if needed)
         # CORRECTED: This condition is now valid. It checks the output of the download step.
-        if: steps.download-deps.outputs.download-path
+        if: ${{ inputs.download-artifacts && steps.download-deps.outputs.download-path }}
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
           echo "--- Setting up local repo with downloaded packages ---"
-          # ls -R x86_64 # Optional: See what was downloaded
+          ls -R x86_64 # Optional: See what was downloaded
           bash scripts/repo-add.sh our-tmp
           echo "[our-tmp]" >> /etc/pacman.conf
           echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf

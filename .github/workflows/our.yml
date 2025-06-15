@@ -40,11 +40,13 @@ jobs:
               toolong nali-nt-git envfetch nautilus-admin-gtk4 hyprls-git
               hyprshot-gui matugen-git clipse-git
             makepkg_conf: ./configs/makepkg.conf
+            download-artifacts: false
           # No-LTO builds
           - name: base-no-lto
             packages: >-
               libcava wezterm-git
             makepkg_conf: ./configs/makepkg-no-lto.conf
+            download-artifacts: false
     uses: ./.github/workflows/reusable-build.yml
     with:
       packages: ${{ matrix.packages }}
@@ -66,6 +68,7 @@ jobs:
         libastal-4-git libastal-cava-git libastal-tray-git
       makepkg-conf: ./configs/makepkg.conf
       artifact-name: packages-stage-2
+      download-artifacts: true
     secrets: inherit
 
   build-stage-3:
@@ -78,6 +81,7 @@ jobs:
         libastal-meta libastal-gjs-git
       makepkg-conf: ./configs/makepkg.conf
       artifact-name: packages-stage-3
+      download-artifacts: true
     secrets: inherit
 
   build-stage-4:
@@ -90,6 +94,7 @@ jobs:
         aylurs-gtk-shell-git
       makepkg-conf: ./configs/makepkg.conf
       artifact-name: packages-stage-4
+      download-artifacts: true
     secrets: inherit
 
   build-stage-5:
@@ -102,13 +107,14 @@ jobs:
         ags-hyprpanel-git
       makepkg-conf: ./configs/makepkg.conf
       artifact-name: packages-stage-5
+      download-artifacts: true
     secrets: inherit
 
   #####################################################################
   # FINAL STAGE: Aggregate all packages, build repo, and publish.
   #####################################################################
   publish:
-    name: Publish to Repo and Pages
+    name: Publish to Pages
     needs: build-stage-5 # This transitively depends on all previous stages
     runs-on: ubuntu-latest
     permissions:
