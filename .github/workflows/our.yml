@@ -2,597 +2,104 @@ name: OUR Publish
 
 on:
   schedule:
-    - cron: 0 0 * * *
+    - cron: '0 0 * * *'
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - ".github/workflows/our.yml"
+      - '.github/workflows/our.yml'
+      - '.github/workflows/reusable-build.yml'
+      - 'scripts/**'
+      - 'configs/**'
 
 jobs:
+  #####################################################################
+  # STAGE 1: Build packages with no AUR dependencies.
+  # This combines the original 'build-stage-1' and 'independent-build'.
+  #####################################################################
   build-stage-1:
     strategy:
-      matrix:
-        repos:
-          ######################################################
-          # Below are AUR packages that are depended by others #
-          ######################################################
-          - portable # depby: wechat
-          - wemeet-bin # depby: wemeet-wayland-screenshare-git
-          - xwaylandvideobridge # depby: wemeet-wayland-screenshare-git
-          - execstack # depby: dingtalk-bin
-          - ckbcomp # depby: calamares-git
-          - unionfs-fuse # depby: flutter-bin
-          ### libastal series for hyprpanel ###
-          - libastal-io-git # depby: libastal-git, libastal-4-git, libastal-meta
-          - libastal-apps-git # depby: libastal-meta
-          - libastal-auth-git # depby: libastal-meta
-          - libastal-battery-git # depby: libastal-meta
-          - libastal-bluetooth-git # depby: libastal-meta
-          - libastal-greetd-git # depby: libastal-meta
-          - libastal-hyprland-git # depby: libastal-meta
-          - libastal-mpris-git # depby: libastal-meta
-          - libastal-network-git # depby: libastal-meta
-          - libastal-notifd-git # depby: libastal-meta
-          - appmenu-glib-translator-git # depby: libastal-tray-git
-          - libastal-powerprofiles-git # depby: libastal-meta
-          - libastal-river-git # depby: libastal-meta
-          - libastal-wireplumber-git # depby: libastal-meta
       fail-fast: false
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
-
-  build-stage-1-no-lto:
-    strategy:
       matrix:
-        repos:
-          ###############################################################
-          # Below are AUR packages that are depended by others. No LTO! #
-          ###############################################################
-          - libcava # depby: libastal-cava-git
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
+        include:
+          # LTO enabled builds
+          - name: base-lto
+            packages: >-
+              portable wemeet-bin xwaylandvideobridge execstack ckbcomp
+              unionfs-fuse libastal-io-git libastal-apps-git libastal-auth-git
+              libastal-battery-git libastal-bluetooth-git libastal-greetd-git
+              libastal-hyprland-git libastal-mpris-git libastal-network-git
+              libastal-notifd-git appmenu-glib-translator-git libastal-powerprofiles-git
+              libastal-river-git libastal-wireplumber-git nodejs-gitmoji-cli hiddify-next-bin
+              hyprland-interactive-screenshot pmount mihomo-party fcitx5-skin-fluentdark-git
+              fcitx5-skin-fluentlight-git watt-toolkit-bin hfd-git wsl-open
+              wsl2-ssh-agent listen1 feeluown-download ascii-image-converter
+              toolong nali-nt-git envfetch nautilus-admin-gtk4 hyprls-git
+              hyprshot-gui matugen-git clipse-git
+            makepkg_conf: ./configs/makepkg.conf
+          # No-LTO builds
+          - name: base-no-lto
+            packages: >-
+              libcava wezterm-git
+            makepkg_conf: ./configs/makepkg-no-lto.conf
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      packages: ${{ matrix.packages }}
+      makepkg-conf: ${{ matrix.makepkg_conf }}
+      artifact-name: packages-${{ matrix.name }}
+    secrets: inherit # Pass all secrets to the reusable workflow
 
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
-
+  #####################################################################
+  # STAGE 2-5: Build packages with dependencies on previous stages.
+  #####################################################################
   build-stage-2:
-    strategy:
-      matrix:
-        repos:
-          ############################################################
-          # Below are AUR packages that depend on other AUR packages #
-          ############################################################
-          - wemeet-wayland-screenshare-git # depon: wemeet-bin, xwaylandvideobridge
-          - calamares-git # depon: ckbcomp
-          ### libastal series for hyprpanel ###
-          - libastal-git # depon: libastal-io-git | depby: libastal-meta, libastal-gjs-git
-          - libastal-4-git # depon: libastal-io-git | depby: libastal-meta
-          - libastal-cava-git # depon: libcava | depby: libastal-meta
-          - libastal-tray-git # depon: appmenu-glib-translator-git | depby: libastal-meta
-    needs: 
-      - build-stage-1
-      - build-stage-1-no-lto
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Add tmp repo db
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/repo-add.sh our-tmp
-          echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
-          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*'
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
+    needs: build-stage-1
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      packages: >-
+        wemeet-wayland-screenshare-git calamares-git libastal-git
+        libastal-4-git libastal-cava-git libastal-tray-git
+      makepkg-conf: ./configs/makepkg.conf
+      artifact-name: packages-stage-2
+    secrets: inherit
 
   build-stage-3:
-    strategy:
-      matrix:
-        repos:
-          ##############################################################
-          # Below are AUR packages that depend on Stage 2 AUR packages #
-          ##############################################################
-          ### libastal series for hyprpanel ###
-          - libastal-meta # depby: aylurs-gtk-shell-git
-          - libastal-gjs-git # depon: libastal-git | depby: aylurs-gtk-shell-git
     needs: build-stage-2
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Add tmp repo db
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/repo-add.sh our-tmp
-          echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
-          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*'
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      packages: >-
+        libastal-meta libastal-gjs-git
+      makepkg-conf: ./configs/makepkg.conf
+      artifact-name: packages-stage-3
+    secrets: inherit
 
   build-stage-4:
-    strategy:
-      matrix:
-        repos:
-          ##############################################################
-          # Below are AUR packages that depend on Stage 3 AUR packages #
-          ##############################################################
-          - aylurs-gtk-shell-git # depon: libastal-gjs-git, libastal-meta | depby: ags-hyprpanel-git
     needs: build-stage-3
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Add tmp repo db
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/repo-add.sh our-tmp
-          echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
-          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*'
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      packages: >-
+        aylurs-gtk-shell-git
+      makepkg-conf: ./configs/makepkg.conf
+      artifact-name: packages-stage-4
+    secrets: inherit
 
   build-stage-5:
-    strategy:
-      matrix:
-        repos:
-          ##############################################################
-          # Below are AUR packages that depend on Stage 4 AUR packages #
-          ##############################################################
-          - ags-hyprpanel-git # depon: aylurs-gtk-shell-git
     needs: build-stage-4
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      packages: >-
+        ags-hyprpanel-git
+      makepkg-conf: ./configs/makepkg.conf
+      artifact-name: packages-stage-5
+    secrets: inherit
 
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Add tmp repo db
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/repo-add.sh our-tmp
-          echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
-          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*'
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
-
-  independent-build:
-    strategy:
-      matrix:
-        repos:
-          - nodejs-gitmoji-cli
-          - hiddify-next-bin
-          - hyprland-interactive-screenshot
-          - pmount
-          - mihomo-party
-          - fcitx5-skin-fluentdark-git
-          - fcitx5-skin-fluentlight-git
-          - watt-toolkit-bin
-          - hfd-git
-          - wsl-open
-          - wsl2-ssh-agent
-          - listen1
-          - feeluown-download
-          - ascii-image-converter
-          - toolong
-          - nali-nt-git
-          - envfetch
-          - nautilus-admin-gtk4
-          - hyprls-git
-          - hyprshot-gui
-          - matugen-git
-          - clipse-git
-      fail-fast: false
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
-
-  independent-build-no-lto:
-    strategy:
-      matrix:
-        repos:
-          - wezterm-git
-      fail-fast: false
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Prepare environment
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Build AUR packages
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ matrix.repos }}
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ matrix.repos }}
-          path: |
-            *.zst*
-
-  repo-add:
-    needs: 
-      - build-stage-5
-      - independent-build
-      - independent-build-no-lto
-    runs-on: ubuntu-latest
-    container: "archlinux:latest"
-    permissions:
-      contents: write
-
-    steps:
-      #   - name: Free disk space (Ubuntu)
-      #     uses: jlumbroso/free-disk-space@main
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Generate repo db
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/repo-add.sh our
-
-      - name: Upload repo.db
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: repo-db
-          path: |
-            x86_64/*.db*
-            x86_64/*.files*
-
-  publish-to-page:
-    needs: repo-add
-    concurrency:
-      group: publish-to-page
-      cancel-in-progress: false
+  #####################################################################
+  # FINAL STAGE: Aggregate all packages, build repo, and publish.
+  #####################################################################
+  publish:
+    name: Publish to Repo and Pages
+    needs: build-stage-5 # This transitively depends on all previous stages
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -603,28 +110,40 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          lfs: false
 
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      
+      - name: Download all built packages
+        uses: actions/download-artifact@v4
         with:
           path: x86_64
           merge-multiple: true
 
-      - name: Generate package index
+      - name: Display downloaded files
         run: |
-          python scripts/gen-index.py
+          echo "--- All built packages ---"
+          ls -R x86_64
 
-      - name: Setup pages
+      - name: Generate repository database
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: bash scripts/repo-add.sh our
+
+      - name: Generate package index page
+        run: python scripts/gen-index.py
+
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: "."
 
       - name: Deploy to GitHub Pages
@@ -632,25 +151,19 @@ jobs:
         uses: actions/deploy-pages@v4
 
   publish-to-hf:
-    needs: repo-add
-    concurrency:
-      group: publish-to-hf
-      cancel-in-progress: false
+    name: Publish to Hugging Face
+    needs: build-stage-5
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
-      - name: Download built packages
-        uses: actions/download-artifact@v4.1.8
+      - name: Download all built packages
+        uses: actions/download-artifact@v4
         with:
-          path: x86_64
+          path: .
           merge-multiple: true
 
-      - name: Release to huggingface
-        continue-on-error: true
+      - name: Release to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          pip install -U huggingface_hub
-          huggingface-cli upload-large-folder --token $HF_TOKEN --repo-type model Orion-zhen/our . --no-bars
+          pip install -U "huggingface_hub[cli]"
+          huggingface-cli upload --repo-type model Orion-zhen/our . . --commit-message "Publish latest packages"
