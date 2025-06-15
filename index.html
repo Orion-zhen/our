@@ -46,8 +46,8 @@
       <section id="about" class="fade-in-up">
         <h2>About This Repository</h2>
         <p>
-          This repository includes a bunch of useful AUR packages that are not listed in other popular Arch
-          repositories, such as linuxqq, wechat, wemeet, dingtalk, etc. The repository builder is powered by
+          This repository includes a bunch of useful AUR packages that might not be listed in other popular Arch
+          repositories, such as ags-hyprpanel-git, hyprshot-gui, clipse-git, etc. The repository builder is powered by
           GitHub Actions. It will automatically pull AUR packages, build them, and release to my GitHub page
           and Huggingface repository everyday.
         </p>
@@ -66,6 +66,8 @@ Server = https://orion-zhen.github.io/our/$arch
         <pre><code class="language-bash fade-in-up">sudo tee -a /etc/pacman.conf << EOF
 
 [our]
+# SigLevel = Optional TrustAll
+# Uncomment this if you encounter GPG key error
 # SigLevel = Optional TrustAll
 Server = https://orion-zhen.github.io/our/$arch
 EOF
