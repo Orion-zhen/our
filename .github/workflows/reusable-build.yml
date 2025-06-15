@@ -1,5 +1,4 @@
 # File: .github/workflows/reusable-build.yml
-# 这个文件不需要改动，它已经很好了。
 name: Reusable AUR Build
 
 on:
@@ -33,7 +32,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ... (其他步骤如 import gpg, prepare env) ...
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         with:
@@ -44,6 +42,7 @@ jobs:
         if: ${{ inputs.lto }}
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
@@ -52,6 +51,7 @@ jobs:
         if: ${{ !inputs.lto }}
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
@@ -83,7 +83,6 @@ jobs:
         run: |
           bash scripts/build-one.sh ${{ inputs.package }}
 
-      # ... (Rename and Upload steps) ...
       - name: Rename files with illegal characters
         run: |
           find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done

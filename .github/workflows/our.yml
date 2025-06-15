@@ -2,42 +2,24 @@ name: OUR Publish
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - '.github/workflows/our.yml'
-      - '.github/workflows/reusable-build.yml'
-      - 'scripts/**'
-      - 'configs/**'
+      - ".github/workflows/our.yml"
+      - ".github/workflows/reusable-build.yml"
+      - "scripts/**"
+      - "configs/**"
 
 jobs:
-  build-stage-1:
+  standalone:
     strategy:
       fail-fast: false
       matrix:
         # LTO-enabled packages
         package:
-          - ckbcomp # depby: calamares-git
-          ### libastal series for hyprpanel ###
-          # - libastal-io-git 
-          # - libastal-apps-git 
-          # - libastal-auth-git
-          # - libastal-battery-git 
-          # - libastal-bluetooth-git 
-          # - libastal-greetd-git
-          # - libastal-hyprland-git 
-          # - libastal-mpris-git 
-          # - libastal-network-git
-          # - libastal-notifd-git 
-          # - appmenu-glib-translator-git 
-          # - libastal-powerprofiles-git
-          # - libastal-river-git 
-          # - libastal-wireplumber-git
-          ### End libastal ###
-          # Independent packages merged here
           - nodejs-gitmoji-cli
           - hiddify-next-bin
           - hyprland-interactive-screenshot
@@ -69,13 +51,11 @@ jobs:
       download-artifacts: false
     secrets: inherit
 
-  build-stage-1-no-lto:
+  standalone-no-lto:
     strategy:
       fail-fast: false
       matrix:
         package:
-          - libcava # depby: libastal-cava-git
-          # Independent packages merged here
           - wezterm-git
     uses: ./.github/workflows/reusable-build.yml
     permissions:
@@ -86,10 +66,57 @@ jobs:
       download-artifacts: false
     secrets: inherit
 
-  build-stage-2:
+  stage-1:
+    strategy:
+      fail-fast: false
+      matrix:
+        # LTO-enabled packages
+        package:
+          - ckbcomp # depby: calamares-git
+          ### libastal series for hyprpanel ###
+          # - libastal-io-git 
+          # - libastal-apps-git 
+          # - libastal-auth-git
+          # - libastal-battery-git 
+          # - libastal-bluetooth-git 
+          # - libastal-greetd-git
+          # - libastal-hyprland-git 
+          # - libastal-mpris-git 
+          # - libastal-network-git
+          # - libastal-notifd-git 
+          # - appmenu-glib-translator-git 
+          # - libastal-powerprofiles-git
+          # - libastal-river-git 
+          # - libastal-wireplumber-git
+          ### End libastal ###
+    uses: ./.github/workflows/reusable-build.yml
+    permissions:
+      contents: write
+    with:
+      package: ${{ matrix.package }}
+      lto: true
+      download-artifacts: false
+    secrets: inherit
+
+  stage-1-no-lto:
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - libcava # depby: libastal-cava-git
+    uses: ./.github/workflows/reusable-build.yml
+    permissions:
+      contents: write
+    with:
+      package: ${{ matrix.package }}
+      lto: false
+      download-artifacts: false
+    secrets: inherit
+
+  stage-2:
     needs: 
-      - build-stage-1
-      - build-stage-1-no-lto # Depend on both LTO and no-LTO groups
+      - stage-1
+      - stage-1-no-lto # Depend on both LTO and no-LTO groups
     strategy:
       fail-fast: false
       matrix:
@@ -110,8 +137,8 @@ jobs:
       download-artifacts: true
     secrets: inherit
 
-  # build-stage-3:
-  #   needs: build-stage-2
+  # stage-3:
+  #   needs: stage-2
   #   strategy:
   #     fail-fast: false
   #     matrix:
@@ -126,8 +153,8 @@ jobs:
   #     download-artifacts: true
   #   secrets: inherit
 
-  # build-stage-4:
-  #   needs: build-stage-3
+  # stage-4:
+  #   needs: stage-3
   #   strategy:
   #     fail-fast: false
   #     matrix:
@@ -141,8 +168,8 @@ jobs:
   #     download-artifacts: true
   #   secrets: inherit
 
-  # build-stage-5:
-  #   needs: build-stage-4
+  # stage-5:
+  #   needs: stage-4
   #   strategy:
   #     fail-fast: false
   #     matrix:
@@ -161,7 +188,10 @@ jobs:
   #####################################################################
   publish:
     name: Publish to Pages
-    needs: build-stage-2 # This transitively depends on all previous stages
+    needs: # This transitively depends on all previous stages
+      - standalone
+      - standalone-no-lto
+      - stage-2
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
@@ -218,7 +248,7 @@ jobs:
 
   publish-to-hf:
     name: Publish to Hugging Face
-    needs: build-stage-2
+    needs: stage-2
     runs-on: ubuntu-latest
     steps:
       - name: Download all built packages

@@ -33,7 +33,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare environment (No LTO)
@@ -42,7 +42,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare environment (Clean Build)
@@ -50,7 +50,7 @@ jobs:
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Import GPG
