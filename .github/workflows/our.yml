@@ -65,7 +65,7 @@ jobs:
       contents: write
     with:
       package: ${{ matrix.package }}
-      makepkg-conf: ./configs/makepkg.conf
+      lto: true
       download-artifacts: false
     secrets: inherit
 
@@ -82,7 +82,7 @@ jobs:
       contents: write
     with:
       package: ${{ matrix.package }}
-      makepkg-conf: ./configs/makepkg-no-lto.conf
+      lto: false
       download-artifacts: false
     secrets: inherit
 
@@ -106,7 +106,7 @@ jobs:
       contents: write
     with:
       package: ${{ matrix.package }}
-      makepkg-conf: ./configs/makepkg.conf
+      lto: true
       download-artifacts: true
     secrets: inherit
 
@@ -124,7 +124,7 @@ jobs:
     permissions: { contents: write }
     with:
       package: ${{ matrix.package }}
-      makepkg-conf: ./configs/makepkg.conf
+      lto: true
       download-artifacts: true
     secrets: inherit
 
@@ -139,7 +139,7 @@ jobs:
     permissions: { contents: write }
     with:
       package: ${{ matrix.package }}
-      makepkg-conf: ./configs/makepkg.conf
+      lto: true
       download-artifacts: true
     secrets: inherit
 
@@ -154,7 +154,7 @@ jobs:
     permissions: { contents: write }
     with:
       package: ${{ matrix.package }}
-      makepkg-conf: ./configs/makepkg.conf
+      lto: true
       download-artifacts: true
     secrets: inherit
 

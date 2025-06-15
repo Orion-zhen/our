@@ -9,10 +9,10 @@ on:
         description: 'The package to build'
         required: true
         type: string
-      makepkg-conf:
-        description: 'Path to the makepkg.conf file to use'
-        required: true
-        type: string
+      lto:
+        description: "Enable LTO"
+        default: true
+        type: boolean
       download-artifacts:
         description: 'Whether to download artifacts from previous jobs'
         required: true
@@ -41,9 +41,18 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Prepare build environment
+        if: ${{ inputs.lto }}
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ${{ inputs.makepkg-conf }} >> /etc/makepkg.conf
+          cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Prepare build environment (No LTO)
+        if: ${{ !inputs.lto }}
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
       
