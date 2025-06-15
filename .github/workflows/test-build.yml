@@ -7,6 +7,10 @@ on:
         description: "AUR package to test build"
         required: true
         type: string
+      lto:
+        description: "Enable LTO"
+        default: true
+        type: boolean
 
 jobs:
   test-build:
@@ -20,10 +24,20 @@ jobs:
           lfs: false
 
       - name: Prepare environment
+        if: ${{ inputs.lto }}
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
+          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Prepare environment
+        if: ${{ !inputs.lto }}
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ./configs/pacman.conf >> /etc/pacman.conf
+          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
           pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree yay --noconfirm --overwrite '*'
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
