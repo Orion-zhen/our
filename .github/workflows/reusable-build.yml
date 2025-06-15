@@ -1,0 +1,88 @@
+# File: .github/workflows/reusable-build.yml
+name: Reusable AUR Build
+
+on:
+  workflow_call:
+    inputs:
+      packages:
+        description: 'A space-separated string of packages to build'
+        required: true
+        type: string
+      makepkg-conf:
+        description: 'Path to the makepkg.conf file to use'
+        required: true
+        type: string
+      artifact-name:
+        description: 'Name for the uploaded artifact'
+        required: true
+        type: string
+    secrets:
+      GPG_SEC_KEY:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+      GPG_SIG_KEY:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: "archlinux:latest"
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare build environment
+        run: |
+          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+          cat ${{ inputs.makepkg-conf }} >> /etc/makepkg.conf
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Download previously built dependencies (if any exist)
+        uses: actions/download-artifact@v4
+        with:
+          path: x86_64
+          merge-multiple: true
+
+      - name: Setup local repo for dependencies (if needed)
+        # Only run this if packages were actually downloaded
+        if: |
+          (steps.download-deps.outputs.download-path != '' && 
+           (ls x86_64/*.pkg.tar.zst 2>/dev/null || ls x86_64/*.pkg.tar.zst.sig 2>/dev/null))
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          echo "--- Setting up local repo with downloaded packages ---"
+          bash scripts/repo-add.sh our-tmp
+          echo "[our-tmp]" >> /etc/pacman.conf
+          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
+          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
+          pacman -Syu --noconfirm --overwrite '*'
+        id: setup-repo
+
+      - name: Build AUR packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        run: |
+          bash scripts/build-one.sh ${{ inputs.packages }}
+
+      - name: Rename files with illegal characters
+        run: |
+          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: |
+            *.zst*
