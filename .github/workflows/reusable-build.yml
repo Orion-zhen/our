@@ -62,7 +62,7 @@ jobs:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         run: |
           echo "--- Setting up local repo with downloaded packages ---"
-          ls -R x86_64 # Optional: See what was downloaded
+          # ls -R x86_64 # Optional: See what was downloaded
           bash scripts/repo-add.sh our-tmp
           echo "[our-tmp]" >> /etc/pacman.conf
           echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
