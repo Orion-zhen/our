@@ -52,6 +52,7 @@ jobs:
       packages: ${{ matrix.packages }}
       makepkg-conf: ${{ matrix.makepkg_conf }}
       artifact-name: packages-${{ matrix.name }}
+      download-artifacts: true
     secrets: inherit # Pass all secrets to the reusable workflow
 
   #####################################################################
