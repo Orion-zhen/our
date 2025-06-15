@@ -10,16 +10,12 @@ If you want some nice packages in AUR, just feel free to issue 🤗
 
 ## Features
 
-- [x] Use hierarchical build steps to resolve dependencies between AUR packages
-- [x] Provides a variety of useful AUR packages:
-  - [x] Social Apps: [linuxqq](https://aur.archlinux.org/packages/linuxqq), [wechat](https://aur.archlinux.org/packages/wechat), [wemeet-bin](https://aur.archlinux.org/packages/wemeet-bin), [dingtalk-bin](https://aur.archlinux.org/packages/dingtalk-bin), etc.
-  - [x] Media Apps: [listen1](https://aur.archlinux.org/packages/listen1), [4kvideodownloaderplus](https://aur.archlinux.org/packages/4kvideodownloaderplus), etc.
-  - [x] Proxy tools: [mihomo](https://aur.archlinux.org/packages/mihomo), [hiddify](https://aur.archlinux.org/packages/hiddify), [watt-toolkit-bin](https://aur.archlinux.org/packages/watt-toolkit-bin), etc.
-  - [x] And more to discover...
-- [x] Signed with my GPG key
-- [x] Built and released everyday to ensure the latest packages
-- [x] Backup sources on Huggingface and HF-Mirror
-- [x] Completely **FREE** to community with GPL-v3.0 license
+- ✅ Use hierarchical build steps to resolve dependencies between AUR packages
+- ✅ Provides a variety of useful AUR packages
+- ✅ Signed with my GPG key
+- ✅ Built and released everyday to ensure the latest packages
+- ✅ Backup sources on Huggingface and HF-Mirror
+- ✅ Completely **FREE** to community with GPL-v3.0 license
 
 ## Usage
 
