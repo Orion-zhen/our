@@ -1,0 +1,359 @@
+/* --- 1. Global Styles & Variables --- */
+:root {
+    --bg-color: #1a1a1b;
+    /* 深邃的背景色 */
+    --surface-color: #27272a;
+    /* 卡片、代码块等元素的表面颜色 */
+    --border-color: #3f3f46;
+    /* 边框和分隔线颜色 */
+    --text-primary: #f4f4f5;
+    /* 主要文本颜色 (白色) */
+    --text-secondary: #a1a1aa;
+    /* 次要文本颜色 (灰色) */
+    --accent-color: #06b6d4;
+    /* 强调色 (青色/Cyan) */
+    --accent-color-hover: #22d3ee;
+    /* 强调色悬停 */
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--accent-color-hover);
+    text-decoration: underline;
+}
+
+/* --- 2. Layout & Sections --- */
+.site-header,
+.site-footer {
+    padding: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.site-footer {
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9em;
+    margin-top: 4rem;
+}
+
+main>section {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+main>section:last-of-type {
+    border-bottom: none;
+}
+
+/* --- 3. Component Styles --- */
+/* Header */
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.logo:hover {
+    color: var(--accent-color);
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.main-nav a {
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+/* Hero Section */
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    background: linear-gradient(45deg, var(--text-primary), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-section .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* General Section Content */
+h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-color);
+    display: inline-block;
+}
+
+section p {
+    margin-bottom: 1rem;
+    max-width: 75ch;
+    /* 优化阅读行长 */
+    color: var(--text-secondary);
+}
+
+section p:last-child {
+    margin-bottom: 0;
+}
+
+/* Code Blocks */
+pre {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+pre code {
+    font-family: inherit;
+}
+
+p>code {
+    /* Inline code */
+    background-color: var(--surface-color);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--text-primary);
+}
+
+
+/* --- 4. Package List & Cards (Grid Layout) --- */
+.package-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 15px;
+    /* 添加一个左右内边距，防止卡片紧贴边缘 */
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/* 自定义滚动条样式 (无需改变) */
+.package-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.package-scroll-container::-webkit-scrollbar-track {
+    background: var(--surface-color);
+    border-radius: 4px;
+}
+
+.package-scroll-container::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color);
+    border-radius: 4px;
+}
+
+.package-scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-color-hover);
+}
+
+.package-list {
+    display: grid;
+    /* 使用 Grid 布局 */
+    grid-auto-flow: column;
+    /* 让网格内容横向流动，实现横向滚动 */
+    grid-template-rows: repeat(3, 1fr);
+    /* 创建三行，高度平分 */
+    gap: 1rem;
+    width: max-content;
+    padding: 0.5rem 2px;
+}
+
+.loading-text {
+    color: var(--text-secondary);
+}
+
+.package-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 280px;
+    height: 140px;
+    /* 如果行高不一致，可以设为 min-height */
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-decoration: none;
+    /* 移除之前的 transform 过渡，因为动画将处理它 */
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.package-card:hover {
+    /* 保持悬停效果，但不改变 transform */
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+}
+
+.package-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-all;
+    /* 防止长名称溢出 */
+}
+
+.package-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.package-info span {
+    display: block;
+    /* 版本和架构换行显示 */
+}
+
+.package-arch {
+    opacity: 0.7;
+}
+
+.package-size {
+    padding: 0.2em 0.6em;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+}
+
+/* 根据文件大小的条件化样式 */
+.size-b {
+    background-color: #3f3f46;
+    color: #f4f4f5;
+}
+
+.size-kb {
+    background-color: #164e63;
+    color: #cffafe;
+}
+
+/* 青色系 */
+.size-mb {
+    background-color: #7c2d12;
+    color: #ffedd5;
+}
+
+/* 橙色系 */
+.size-gb {
+    background-color: #7f1d1d;
+    color: #fee2e2;
+}
+
+/* 红色系 */
+
+/* --- 5. Scroll Animation --- */
+/* 5.1 Section Fade-in Animation (保持不变) */
+/* 
+    准备应用动画的元素。
+    初始状态：向下平移20px，完全透明。
+    opacity 和 transform 属性将会被过渡。
+    贝塞尔曲线 ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1) 提供了一个快速开始、然后平滑减速的效果，非常优雅。
+*/
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+        transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 
+  当元素进入视口时，JS 会为其添加 .visible 类。
+  最终状态：完全不透明，回到原始位置（transform被重置）。
+*/
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 为每个动画元素添加一个小的延迟，使其逐个出现，更有层次感 */
+.fade-in-up:nth-child(2) {
+    transition-delay: 0.1s;
+}
+
+.fade-in-up:nth-child(3) {
+    transition-delay: 0.2s;
+}
+
+.fade-in-up:nth-child(4) {
+    transition-delay: 0.3s;
+}
+
+/* 5.2 NEW: Package Card Fly-in Animation */
+.card-fly-in {
+    opacity: 0;
+    /* 统一的过渡效果，应用于不透明度和 transform */
+    transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 定义不同方向的初始状态 */
+.from-left {
+    transform: translateX(-50px);
+}
+
+.from-right {
+    transform: translateX(50px);
+}
+
+.from-top {
+    transform: translateY(-50px);
+}
+
+.from-bottom {
+    transform: translateY(50px);
+}
+
+/* 当卡片可见时，重置所有状态 */
+.card-fly-in.visible {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+}

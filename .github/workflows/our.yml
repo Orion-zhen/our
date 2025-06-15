@@ -199,7 +199,10 @@ jobs:
         run: bash scripts/repo-add.sh our
 
       - name: Generate package index page
-        run: python scripts/gen-index.py
+        run: |
+          pacman -Syu python python-pip --noconfirm --overwrite '*'
+          pip install zstandard --break-system-packages
+          python scripts/packages.py
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
