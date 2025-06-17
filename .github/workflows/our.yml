@@ -73,7 +73,7 @@ jobs:
         # LTO-enabled packages
         package:
           - ckbcomp # depby: calamares-git
-          - google-breakpad-git # depby: quickshell-git
+          - google-breakpad # depby: quickshell-git
           ### libastal series for hyprpanel ###
           - libastal-io-git
           - libastal-apps-git
