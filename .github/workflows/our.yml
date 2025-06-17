@@ -123,7 +123,7 @@ jobs:
       matrix:
         package:
           - calamares-git # depon: ckbcomp
-          # - quickshell-git # depon: google-breakpad-git
+          - quickshell-git # depon: google-breakpad
           ### libastal series for hyprpanel ###
           - libastal-git
           - libastal-4-git
