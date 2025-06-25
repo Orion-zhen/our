@@ -21,23 +21,18 @@ jobs:
         # LTO-enabled packages
         package:
           - nodejs-gitmoji-cli
-          - hiddify-next-bin
-          - hyprland-interactive-screenshot
           - pmount
           - mihomo-party
           - fcitx5-skin-fluentdark-git
           - fcitx5-skin-fluentlight-git
-          - watt-toolkit-bin
           - hfd-git
           - wsl-open
           - wsl2-ssh-agent
           - listen1
-          - feeluown-download
           - ascii-image-converter
           - toolong
           - nali-nt-git
           - envfetch
-          - nautilus-admin-gtk4
           - hyprls-git
           - hyprshot-gui
           - matugen-git
