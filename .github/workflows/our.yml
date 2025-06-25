@@ -74,6 +74,9 @@ jobs:
         package:
           - ckbcomp # depby: calamares-git
           - google-breakpad # depby: quickshell-git
+          - python-transformers # depby: python-vllm-bin
+          - python-msgspec # depby: python-vllm-bin
+          - python-blake3 # depby: python-vllm-bin
           ### libastal series for hyprpanel ###
           - libastal-io-git
           - libastal-apps-git
@@ -124,6 +127,7 @@ jobs:
         package:
           - calamares-git # depon: ckbcomp
           - quickshell-git # depon: google-breakpad
+          - python-vllm-bin # depon: python-blake3, python-msgspec, python-transformers
           ### libastal series for hyprpanel ###
           - libastal-git
           - libastal-4-git
