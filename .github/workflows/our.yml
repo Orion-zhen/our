@@ -28,7 +28,6 @@ jobs:
           - hfd-git
           - wsl-open
           - wsl2-ssh-agent
-          - listen1
           - ascii-image-converter
           - toolong
           - nali-nt-git
