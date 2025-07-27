@@ -36,6 +36,8 @@ jobs:
           - hyprshot-gui
           - matugen-git
           - clipse-git
+          - vmware-workstation
+          - linux-wallpaperengine-git
     uses: ./.github/workflows/reusable-build.yml
     permissions:
       contents: write
