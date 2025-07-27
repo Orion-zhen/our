@@ -72,7 +72,6 @@ jobs:
           - python-safetensors # depby: python-transformers
           - python-msgspec # depby: python-vllm-bin
           - python-blake3 # depby: python-vllm-bin
-          - uefitool # depby: vmware-workstation
           ### libastal series for hyprpanel ###
           - libastal-io-git
           - libastal-apps-git
@@ -123,7 +122,6 @@ jobs:
         package:
           - calamares-git # depon: ckbcomp
           - quickshell-git # depon: google-breakpad
-          - vmware-workstation # depon: uefitool
           ### libastal series for hyprpanel ###
           - libastal-git
           - libastal-4-git
