@@ -73,7 +73,6 @@ jobs:
           - python-safetensors # depby: python-transformers
           - python-msgspec # depby: python-vllm-bin
           - python-blake3 # depby: python-vllm-bin
-          - python-sentencepiece # depby: llama.cpp-hip
           ### libastal series for hyprpanel ###
           - libastal-io-git
           - libastal-apps-git
@@ -124,7 +123,6 @@ jobs:
         package:
           - calamares-git # depon: ckbcomp
           - quickshell-git # depon: google-breakpad
-          - llama.cpp-hip # depon: python-sentencepiece
           ### libastal series for hyprpanel ###
           - libastal-git
           - libastal-4-git
