@@ -1,0 +1,81 @@
+name: Update AUR Package
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  workflow_dispatch:
+
+env:
+  WORKDIR: aur-repo
+
+jobs:
+  update-aur:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    strategy:
+      matrix:
+        package:
+          # 我维护的 AUR 软件包
+          - clipse-git
+          - hyprshot-gui
+          - llama.cpp-hip
+          - llama.cpp-vulkan
+          - ik-llama.cpp
+          - ik-llama.cpp-cuda
+
+    steps:
+      - name: Set up Arch Linux Environment
+        run: |
+          pacman -Syu --noconfirm git git-lfs base-devel openssh --overwrite '*'
+          sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Set up SSH for AUR
+        run: |
+          # 需要显式指定 /root
+          # 因为 Actions 环境下 $HOME 跟 /root 不是一个地方
+          mkdir -p /root/.ssh
+          
+          # 写入私钥并设置正确的文件权限 (600)
+          echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > /root/.ssh/aur
+          chmod 600 /root/.ssh/aur
+          
+          # 创建 SSH 配置文件
+          # StrictHostKeyChecking=no 会自动接受并添加新的主机密钥，避免交互提示
+          # UserKnownHostsFile=/dev/null 避免将密钥写入文件，防止潜在冲突
+          echo "Host aur.archlinux.org" > /root/.ssh/config
+          echo "  IdentityFile /root/.ssh/aur" >> /root/.ssh/config
+          echo "  User aur" >> /root/.ssh/config
+          echo "  StrictHostKeyChecking no" >> /root/.ssh/config
+          echo "  UserKnownHostsFile=/dev/null" >> /root/.ssh/config
+
+          # 设置正确的目录和文件权限
+          chmod 700 /root/.ssh
+          chmod 644 /root/.ssh/config
+
+      - name: Clone AUR Repository
+        env:
+          GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=no
+        run: git clone -v ssh://aur@aur.archlinux.org/${{ matrix.package }}.git ${{ env.WORKDIR }}
+
+      - name: Update AUR Repository
+        working-directory: ${{ env.WORKDIR }}
+        run: |
+          # 仅更新版本号 (通过 pkgver)
+          makepkg --nodeps --nobuild --noconfirm --noprogressbar
+
+          makepkg --printsrcinfo > .SRCINFO
+
+      - name: Push Changes
+        working-directory: ${{ env.WORKDIR }}
+        continue-on-error: true
+        run: |
+          git config user.name "Orion"
+          git config user.email "github-action-bot@no-reply.com"
+
+          NEW_VERSION=$(grep 'pkgver =' .SRCINFO | awk '{print $3}')
+
+          git add PKGBUILD .SRCINFO
+          git commit -m "Bump version to ${NEW_VERSION}"
+          git push
