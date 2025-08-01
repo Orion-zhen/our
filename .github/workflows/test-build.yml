@@ -4,15 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "AUR package to test build"
+        description: AUR package to test build
         required: true
         type: string
       lto:
-        description: "Enable LTO"
+        description: Enable LTO
         default: true
         type: boolean
+      gpg-sign:
+        description: Use GPG sign
+        default: false
+        type: boolean
       clean-build:
-        description: "Build without any extra config"
+        description: Build without any extra config
         default: false
         type: boolean
 
@@ -22,60 +26,10 @@ jobs:
     container: archlinux:latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: ./.github/workflows/reusable-build.yml
         with:
-          lfs: false
-
-      - name: Prepare environment
-        if: ${{ inputs.lto && !inputs.clean-build }}
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/pacman.conf >> /etc/pacman.conf
-          cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Prepare environment (No LTO)
-        if: ${{ !inputs.lto && !inputs.clean-build }}
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          cat ./configs/pacman.conf >> /etc/pacman.conf
-          cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Prepare environment (Clean Build)
-        if: ${{ inputs.clean-build }}
-        run: |
-          sed -i '/VerbosePkgLists/d' /etc/pacman.conf
-          # cat ./configs/pacman.conf >> /etc/pacman.conf
-          pacman -Syu base-devel git pacman-contrib mold openmp openmpi tree --noconfirm --overwrite '*'
-          sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-      - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Build AUR package
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-        run: |
-          bash scripts/build-one.sh ${{ github.event.inputs.package }}
-
-      - name: Calculate file size
-        run: |
-          bash scripts/file-size.sh
-
-      - name: Rename illigal characters
-        run: |
-          find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
-
-      - name: Upload built packages
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: ${{ github.event.inputs.package }}
-          path: |
-            *.zst*
+          package: ${{ inputs.package }}
+          download-artifacts: false
+          lto: ${{ inputs.lto }}
+          gpg-sign: ${{ inputs.gpg-sign }}
+          clean-build: ${{ inputs.clean-build }}

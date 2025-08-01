@@ -4,10 +4,13 @@
 set -e
 
 # --- 全局设置 ---
-# 检查 GPG 签名密钥是否已设置，这是构建的关键。
-if [ -z "$GPG_SIG_KEY" ]; then
-    echo "Error: GPG_SIG_KEY environment variable is not set."
-    exit 1
+# 如果 GPG_SIGN 变量未设置, 或者其值不为 "0" 或 "false", 则执行签名校验
+if [ -z "$GPG_SIGN" ] || { [ "$GPG_SIGN" != "0" ] && [ "${GPG_SIGN,,}" != "false" ]; }; then
+    # 检查 GPG 签名密钥是否已设置，这是构建的关键
+    if [ -z "$GPG_SIG_KEY" ]; then
+        echo "Error: GPG_SIG_KEY environment variable is not set."
+        exit 1
+    fi
 fi
 
 # 检查是否提供了至少一个包名作为参数。
@@ -61,7 +64,12 @@ for REPO in "$@"; do
     # --sign: 使用 GPG_SIG_KEY 环境变量中指定的密钥进行签名。
     # --skippgpcheck: 跳过对源文件 PGP 签名的验证（在受控的 CI 环境中通常是安全的）。
     echo "--> Building package '$REPO'..."
-    makepkg -fcL --noconfirm --noprogressbar --sign --key "$GPG_SIG_KEY" --skippgpcheck
+    # 如果 GPG_SIGN 变量未设置, 或者其值不为 "0" 或 "false", 则执行签名操作
+    if [ -z "$GPG_SIGN" ] || { [ "$GPG_SIGN" != "0" ] && [ "${GPG_SIGN,,}" != "false" ]; }; then
+        makepkg -fcL --noconfirm --noprogressbar --sign --key "$GPG_SIG_KEY" --skippgpcheck
+    else
+        makepkg -fcL --noconfirm --noprogressbar
+    fi
 
     # --- 清理和移动产物 ---
     # 删除调试包（如果生成了的话）
