@@ -37,6 +37,15 @@ EOF
 
 OUR repository is ready to use 😃
 
+## Development
+
+If you want to build your own repository, just fork this repository, and add these secrets to your Actions environment:
+
+- `GPG_SEC_KEY`: Your GPG secret key
+- `GPG_SIG_KEY`: Your GPG key used for signatures
+- `GPG_PASSPHRASE`: Your GPG key password
+- `AUR_SSH_PRIVATE_KEY`: Your SSH key used for AUR
+
 ## Credits
 
 This repository is inspired by [LeonidPilyugin/kawaii-repo](https://github.com/LeonidPilyugin/kawaii-repo), which contains a bunch of small packages and is maintained on GitHub.
