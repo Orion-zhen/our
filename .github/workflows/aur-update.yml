@@ -111,6 +111,7 @@ jobs:
           echo "  - '${{ env.PACKAGE_PATH }}/PKGBUILD' 同步成功!"
 
       - name: Publish to AUR
+        if: steps.check_changes.outputs.files_changed == 'true'
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
           pkgname: ${{ matrix.package }}
