@@ -34,11 +34,7 @@ optdepends=(
 provides=(${_pkgname})
 conflicts=(${_pkgname} libggml ggml)
 options=(lto !debug)
-source=(
-  "git+${url}"
-  llama.cpp.conf
-  llama.cpp.service
-)
+source=("git+${url}")
 sha256sums=('SKIP')
 
 pkgver() {
