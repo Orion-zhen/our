@@ -29,3 +29,4 @@ jobs:
       lto: ${{ inputs.lto }}
       gpg-sign: ${{ inputs.gpg-sign }}
       clean-build: ${{ inputs.clean-build }}
+    secrets: inherit
