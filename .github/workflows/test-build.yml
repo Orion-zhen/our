@@ -22,14 +22,10 @@ on:
 
 jobs:
   test-build:
-    runs-on: ubuntu-latest
-    container: archlinux:latest
-
-    steps:
-      - uses: ./.github/workflows/reusable-build.yml
-        with:
-          package: ${{ inputs.package }}
-          download-artifacts: false
-          lto: ${{ inputs.lto }}
-          gpg-sign: ${{ inputs.gpg-sign }}
-          clean-build: ${{ inputs.clean-build }}
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      package: ${{ inputs.package }}
+      download-artifacts: false
+      lto: ${{ inputs.lto }}
+      gpg-sign: ${{ inputs.gpg-sign }}
+      clean-build: ${{ inputs.clean-build }}
