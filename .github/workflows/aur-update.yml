@@ -3,6 +3,11 @@ name: Update AUR Packages
 on:
   schedule:
     - cron: 0 0 * * 1
+  push:
+    branches:
+      - main
+    paths:
+      - ourpkg/**
   workflow_dispatch:
     inputs:
       force-push:
