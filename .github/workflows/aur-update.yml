@@ -39,10 +39,10 @@ jobs:
         working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
           echo "--> Running 'makepkg' in ${{ matrix.package }}"
-          # 使用makepkg通过pkgver()函数更新版本号
-          makepkg --nobuild --nodeps
           # 使用updpkgsums更新校验和
           updpkgsums
+          # 使用makepkg通过pkgver()函数更新版本号
+          makepkg --nobuild --nodeps
 
       - name: Check for PKGBUILD changes
         id: check_changes
