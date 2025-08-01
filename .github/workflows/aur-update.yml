@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: 0 0 * * *
   workflow_dispatch:
+    inputs:
+      force-push:
+        description: Force push to AUR
+        default: false
+        type: boolean
 
 env:
   PACKAGE_ROOT: ourpkg
@@ -69,7 +74,7 @@ jobs:
 
       - name: Sync changes to GitHub
         id: sync_to_github
-        if: steps.check_changes.outputs.files_changed == 'true'
+        if: ${{ steps.check_changes.outputs.files_changed }}
         working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         env:
           # GITHUB_TOKEN是Actions自动提供的，用于gh命令的认证
@@ -109,7 +114,7 @@ jobs:
           echo "  - '${{ env.PACKAGE_PATH }}/PKGBUILD' 同步成功!"
 
       - name: Publish to AUR
-        if: steps.check_changes.outputs.files_changed == 'true'
+        if: ${{ inputs.force-push || steps.check_changes.outputs.files_changed }}
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
           pkgname: ${{ matrix.package }}
