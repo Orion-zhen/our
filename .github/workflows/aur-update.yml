@@ -30,6 +30,8 @@ jobs:
           - llama.cpp-vulkan
           - ik-llama.cpp
           - ik-llama.cpp-cuda
+          - ik-llama.cpp-hip
+          - ik-llama.cpp-vulkan
 
     steps:
       - name: Set up Arch Linux Environment
