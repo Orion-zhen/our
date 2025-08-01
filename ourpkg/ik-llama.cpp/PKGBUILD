@@ -64,7 +64,7 @@ build() {
         -DGGML_BLAS_VENDOR=OpenBLAS
         -DGGML_LTO=ON
         -DGGML_RPC=ON
-        -DGGML_NATEVE=ON
+        -DGGML_NATIVE=ON
         -Wno-dev
     )
     cmake "${_cmake_options[@]}"
