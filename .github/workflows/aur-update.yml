@@ -121,5 +121,5 @@ jobs:
           pkgbuild: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/PKGBUILD
           commit_username: Orion
           commit_email: github-action-bot@no-reply.com
-          commit_message: ${{ steps.sync_to_github.outputs.commit_msg }}
+          commit_message: ${{ steps.sync_to_github.outputs.commit_msg || 'Force Update' }}
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
