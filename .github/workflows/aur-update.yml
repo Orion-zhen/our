@@ -67,21 +67,31 @@ jobs:
           # 3. 比较两个哈希值
           if [[ "${LOCAL_SHA}" != "${REMOTE_SHA}" ]]; then
             echo "  - SHAs do not match. Change detected."
-            echo "files_changed=true" >> $GITHUB_OUTPUT
+            echo "push_to_github=true" >> $GITHUB_OUTPUT
           else
             echo "  - SHAs match. No changes detected. Sync will be skipped."
           fi
 
-      - name: Sync changes to GitHub
-        id: sync_to_github
-        if: ${{ steps.check_changes.outputs.files_changed }}
+          # 4. 检查 AUR 上的 PKGBUILD
+          git clone https://aur.archlinux.org/${{ matrix.package }}.git aur-tmp
+          if [[ -f aur-tmp/PKGBUILD ]]; then
+            AUR_SHA=$(git hash-object aur-tmp/PKGBUILD)
+            echo "  - AUR file SHA: ${AUR_SHA}"
+            if [[ "${LOCAL_SHA}" != "${AUR_SHA}" ]]; then
+              echo "  - SHAs do not match. Change detected."
+              echo "publish_to_aur=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "  - Empty AUR repository."
+            echo "publish_to_aur=true" >> $GITHUB_OUTPUT
+          fi
+          rm -rf aur-tmp
+
+      - name: Get version info
+        id: get_version_info
+        if: ${{ steps.check_changes.outputs.push_to_github || steps.check_changes.outputs.publish_to_aur }}
         working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
-        env:
-          # GITHUB_TOKEN是Actions自动提供的，用于gh命令的认证
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_PATH: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
-          # 1. 动态生成一个清晰的提交信息
           # 从更新后的PKGBUILD中提取版本和发布号
           NEW_VERSION=$(grep -m1 '^pkgver=' PKGBUILD | cut -d'=' -f2)
           NEW_PKGREL=$(grep -m1 '^pkgrel=' PKGBUILD | cut -d'=' -f2)
@@ -89,7 +99,15 @@ jobs:
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
           echo "--> Generated commit message: ${COMMIT_MSG}"
 
-          # 2. 开始提交流程
+      - name: Sync changes to GitHub
+        id: sync_to_github
+        if: ${{ steps.check_changes.outputs.push_to_github }}
+        working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
+        env:
+          # GITHUB_TOKEN是Actions自动提供的，用于gh命令的认证
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_PATH: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
+        run: |
           echo "1/3: 获取远程SHA..."
           REMOTE_SHA=$(gh api "repos/${{ github.repository }}/contents/${{ env.PACKAGE_PATH }}/PKGBUILD" --jq .sha || echo "null")
           if [[ "$REMOTE_SHA" == "null" ]]; then
@@ -102,7 +120,7 @@ jobs:
           LOCAL_CONTENT_B64=$(base64 -w0 "PKGBUILD")
 
           echo "3/3: 推送更新到GitHub..."
-          REQUEST_BODY="{\"message\": \"$COMMIT_MSG\", \"content\": \"$LOCAL_CONTENT_B64\""
+          REQUEST_BODY="{\"message\": \"${{ steps.get_version_info.outputs.commit_msg }}\", \"content\": \"$LOCAL_CONTENT_B64\""
           if [[ "$REMOTE_SHA" != "null" ]]; then
               REQUEST_BODY="$REQUEST_BODY, \"sha\": \"$REMOTE_SHA\""
           fi
@@ -114,12 +132,12 @@ jobs:
           echo "  - '${{ env.PACKAGE_PATH }}/PKGBUILD' 同步成功!"
 
       - name: Publish to AUR
-        if: ${{ inputs.force-push || steps.check_changes.outputs.files_changed }}
+        if: ${{ inputs.force-push || steps.check_changes.outputs.publish_to_aur }}
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
           pkgname: ${{ matrix.package }}
           pkgbuild: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/PKGBUILD
           commit_username: Orion
           commit_email: github-action-bot@no-reply.com
-          commit_message: ${{ steps.sync_to_github.outputs.commit_msg || 'Force Update' }}
+          commit_message: ${{ steps.get_version_info.outputs.commit_msg || 'Force Update' }}
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
