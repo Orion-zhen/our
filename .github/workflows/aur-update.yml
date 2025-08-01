@@ -93,9 +93,10 @@ jobs:
         working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
           # 从更新后的PKGBUILD中提取版本和发布号
+          PKGNAME=$(grep -m1 '^pkgname=' PKGBUILD | cut -d'=' -f2)
           NEW_VERSION=$(grep -m1 '^pkgver=' PKGBUILD | cut -d'=' -f2)
           NEW_PKGREL=$(grep -m1 '^pkgrel=' PKGBUILD | cut -d'=' -f2)
-          COMMIT_MSG=":arrow_up: Bump version to ${NEW_VERSION}-${NEW_PKGREL}"
+          COMMIT_MSG=":bookmark: Bump ${PKGNAME} version to ${NEW_VERSION}-${NEW_PKGREL}"
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
           echo "--> Generated commit message: ${COMMIT_MSG}"
 
