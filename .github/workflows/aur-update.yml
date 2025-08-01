@@ -39,8 +39,6 @@ jobs:
         working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
           echo "--> Running 'makepkg' in ${{ matrix.package }}"
-          # 使用updpkgsums更新校验和
-          updpkgsums
           # 使用makepkg通过pkgver()函数更新版本号
           makepkg --nobuild --nodeps
 
@@ -116,8 +114,6 @@ jobs:
         with:
           pkgname: ${{ matrix.package }}
           pkgbuild: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/PKGBUILD
-          assets: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/**/*
-          updpkgsums: false
           commit_username: Orion
           commit_email: github-action-bot@no-reply.com
           commit_message: ${{ steps.sync_to_github.outputs.commit_msg }}
