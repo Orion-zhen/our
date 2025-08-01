@@ -37,7 +37,7 @@ jobs:
           # -maxdepth 1: 限制只查找一级深度
           # -type d: 只查找目录
           # -printf '%f\n': 只打印目录的基础名称（不带'./'前缀），并用换行符分隔
-          PACKAGE_LIST=$(find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R . | jq -s .)
+          PACKAGE_LIST=$(find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R . | jq -cs .)
 
           if [[ "$PACKAGE_LIST" == "[]" ]]; then
             echo "::notice::No packages found in '${{ env.PACKAGE_ROOT }}'. Workflow will end gracefully."
