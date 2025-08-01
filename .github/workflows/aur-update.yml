@@ -1,4 +1,4 @@
-name: Update AUR Package
+name: Update AUR Packages
 
 on:
   schedule:
@@ -6,15 +6,16 @@ on:
   workflow_dispatch:
 
 env:
-  WORKDIR: aur-repo
+  PACKAGE_ROOT: ourpkg
 
 jobs:
-  update-aur:
+  update-and-sync:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:latest
-
+    container: archlinux:latest
+    permissions:
+      contents: write
     strategy:
+      fail-fast: false
       matrix:
         package:
           # 我维护的 AUR 软件包
@@ -28,54 +29,95 @@ jobs:
     steps:
       - name: Set up Arch Linux Environment
         run: |
-          pacman -Syu --noconfirm git git-lfs base-devel openssh --overwrite '*'
+          pacman -Syu --noconfirm --overwrite '*' git github-cli base-devel jq pacman-contrib
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-      - name: Set up SSH for AUR
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update PKGBUILD
+        working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
-          # 需要显式指定 /root
-          # 因为 Actions 环境下 $HOME 跟 /root 不是一个地方
-          mkdir -p /root/.ssh
-          
-          # 写入私钥并设置正确的文件权限 (600)
-          echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > /root/.ssh/aur
-          chmod 600 /root/.ssh/aur
-          
-          # 创建 SSH 配置文件
-          # StrictHostKeyChecking=no 会自动接受并添加新的主机密钥，避免交互提示
-          # UserKnownHostsFile=/dev/null 避免将密钥写入文件，防止潜在冲突
-          echo "Host aur.archlinux.org" > /root/.ssh/config
-          echo "  IdentityFile /root/.ssh/aur" >> /root/.ssh/config
-          echo "  User aur" >> /root/.ssh/config
-          echo "  StrictHostKeyChecking no" >> /root/.ssh/config
-          echo "  UserKnownHostsFile=/dev/null" >> /root/.ssh/config
+          echo "--> Running 'makepkg' in ${{ matrix.package }}"
+          # 使用makepkg通过pkgver()函数更新版本号
+          makepkg --nobuild --nodeps
+          # 使用updpkgsums更新校验和
+          updpkgsums
 
-          # 设置正确的目录和文件权限
-          chmod 700 /root/.ssh
-          chmod 644 /root/.ssh/config
-
-      - name: Clone AUR Repository
+      - name: Check for PKGBUILD changes
+        id: check_changes
+        working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         env:
-          GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=no
-        run: git clone -v ssh://aur@aur.archlinux.org/${{ matrix.package }}.git ${{ env.WORKDIR }}
-
-      - name: Update AUR Repository
-        working-directory: ${{ env.WORKDIR }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_PATH: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
-          # 仅更新版本号 (通过 pkgver)
-          makepkg --nodeps --nobuild --noconfirm --noprogressbar
+          echo "--> Comparing SHA hash for ${{ matrix.package }}..."
 
-          makepkg --printsrcinfo > .SRCINFO
+          # 1. 使用 git hash-object 计算本地 PKGBUILD 的SHA哈希值
+          LOCAL_SHA=$(git hash-object PKGBUILD)
+          echo "  - Local  file SHA: ${LOCAL_SHA}"
 
-      - name: Push Changes
-        working-directory: ${{ env.WORKDIR }}
-        continue-on-error: true
+          # 2. 从GitHub API获取远程文件的SHA哈希值
+          REMOTE_SHA=$(gh api "repos/${{ github.repository }}/contents/${{ env.PACKAGE_PATH }}/PKGBUILD" --jq .sha || echo "null")
+          echo "  - Remote file SHA: ${REMOTE_SHA}"
+
+          # 3. 比较两个哈希值
+          if [[ "${LOCAL_SHA}" != "${REMOTE_SHA}" ]]; then
+            echo "  - SHAs do not match. Change detected."
+            echo "files_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "  - SHAs match. No changes detected. Sync will be skipped."
+          fi
+
+      - name: Sync changes to GitHub
+        id: sync_to_github
+        if: steps.check_changes.outputs.files_changed == 'true'
+        working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
+        env:
+          # GITHUB_TOKEN是Actions自动提供的，用于gh命令的认证
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_PATH: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
-          git config user.name "Orion"
-          git config user.email "github-action-bot@no-reply.com"
+          # 1. 动态生成一个清晰的提交信息
+          # 从更新后的PKGBUILD中提取版本和发布号
+          NEW_VERSION=$(grep -m1 '^pkgver=' PKGBUILD | cut -d'=' -f2)
+          NEW_PKGREL=$(grep -m1 '^pkgrel=' PKGBUILD | cut -d'=' -f2)
+          COMMIT_MSG=":arrow_up: Bump version to ${NEW_VERSION}-${NEW_PKGREL}"
+          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "--> Generated commit message: ${COMMIT_MSG}"
 
-          NEW_VERSION=$(grep 'pkgver =' .SRCINFO | awk '{print $3}')
+          # 2. 开始提交流程
+          echo "1/3: 获取远程SHA..."
+          REMOTE_SHA=$(gh api "repos/${{ github.repository }}/contents/${{ env.PACKAGE_PATH }}/PKGBUILD" --jq .sha || echo "null")
+          if [[ "$REMOTE_SHA" == "null" ]]; then
+              echo "  - 远程文件不存在，将进行创建操作。"
+          else
+              echo "  - 成功获取SHA: ${REMOTE_SHA:0:12}..."
+          fi
 
-          git add PKGBUILD .SRCINFO
-          git commit -m "Bump version to ${NEW_VERSION}"
-          git push
+          echo "2/3: Base64编码本地文件..."
+          LOCAL_CONTENT_B64=$(base64 -w0 "PKGBUILD")
+
+          echo "3/3: 推送更新到GitHub..."
+          REQUEST_BODY="{\"message\": \"$COMMIT_MSG\", \"content\": \"$LOCAL_CONTENT_B64\""
+          if [[ "$REMOTE_SHA" != "null" ]]; then
+              REQUEST_BODY="$REQUEST_BODY, \"sha\": \"$REMOTE_SHA\""
+          fi
+          REQUEST_BODY="$REQUEST_BODY}"
+
+          gh api --method PUT "repos/${{ github.repository }}/contents/${{ env.PACKAGE_PATH }}/PKGBUILD" \
+            --input - <<< "$REQUEST_BODY" > /dev/null
+
+          echo "  - '${{ env.PACKAGE_PATH }}/PKGBUILD' 同步成功!"
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
+        with:
+          pkgname: ${{ matrix.package }}
+          pkgbuild: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/PKGBUILD
+          assets: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/**/*
+          updpkgsums: true
+          commit_username: Orion
+          commit_email: github-action-bot@no-reply.com
+          commit_message: ${{ steps.sync_to_github.outputs.commit_msg }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
