@@ -116,7 +116,7 @@ jobs:
           pkgname: ${{ matrix.package }}
           pkgbuild: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/PKGBUILD
           assets: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}/**/*
-          updpkgsums: true
+          updpkgsums: false
           commit_username: Orion
           commit_email: github-action-bot@no-reply.com
           commit_message: ${{ steps.sync_to_github.outputs.commit_msg }}
