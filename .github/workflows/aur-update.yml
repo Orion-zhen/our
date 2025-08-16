@@ -62,7 +62,7 @@ jobs:
     steps:
       - name: Set up Arch Linux Environment
         run: |
-          pacman -Syu --noconfirm --overwrite '*' git github-cli base-devel jq pacman-contrib
+          pacman -Syu --noconfirm --overwrite '*' git github-cli base-devel jq pacman-contrib nvchecker devtools
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Checkout repository
@@ -71,9 +71,15 @@ jobs:
       - name: Update PKGBUILD
         working-directory: ${{ env.PACKAGE_ROOT }}/${{ matrix.package }}
         run: |
-          echo "--> Running 'makepkg' in ${{ matrix.package }}"
-          # 使用makepkg通过pkgver()函数更新版本号
-          makepkg --nobuild --nodeps
+          if [[ -f ".nvchecker.toml" ]]; then
+            echo "--> Found .nvchecker.toml in ${{ matrix.package }}, using 'pkgctl version upgrade'."
+            # pkgctl 和 nvchecker 配合
+            pkgctl version upgrade
+          else
+            echo "--> Running 'makepkg' in ${{ matrix.package }}"
+            # 使用makepkg通过pkgver()函数更新版本号
+            makepkg --nobuild --nodeps
+          fi
 
       - name: Check for PKGBUILD changes
         id: check_changes
