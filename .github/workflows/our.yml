@@ -38,6 +38,7 @@ jobs:
           - clipse-git
           - linux-wallpaperengine-git
           - llama-swap
+          - slidev-cli
     uses: ./.github/workflows/reusable-build.yml
     permissions:
       contents: write
