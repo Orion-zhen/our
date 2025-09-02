@@ -2,7 +2,10 @@
 
 Orion User's Repository for Arch Linux
 
-This repository includes a bunch of useful AUR packages that are not listed in other popular Arch repositories, such as linuxqq, wechat, wemeet, dingtalk, watt-toolkit(i.e. steam++), etc.
+This is a repository conatins:
+
+- an unofficial Arch Linux repository called `our`
+- AUR `PKGBUILD` files (located at `ourpkg/` folder) maintained by me
 
 The repository builder is powered by GitHub Actions. It will automatically pull AUR packages, build them, and release to my GitHub page and Huggingface repository everyday 😉
 
@@ -15,7 +18,9 @@ If you want some nice packages in AUR, just feel free to issue 🤗
 - ✅ Signed with my GPG key
 - ✅ Built and released everyday to ensure the latest packages
 - ✅ Backup sources on Huggingface and HF-Mirror
-- ✅ Completely **FREE** to community with GPL-v3.0 license
+- ✅ Completely **FREE** to community with GPL-v3.0 license<sup>*</sup>
+
+> <sup>*</sup>: Only all code and files in this repository are licensed under the GPL v3.0 license, while all repositories referenced by `PKGBUILD` files, and the packages built from these repositories, are released under their respective repository licenses.
 
 ## Usage
 
