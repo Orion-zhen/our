@@ -81,7 +81,6 @@ jobs:
     with:
       package: ${{ matrix.package }}
       lto: true
-      download-artifacts: false
     secrets: inherit
 
   build-no-lto:
@@ -97,7 +96,6 @@ jobs:
     with:
       package: ${{ matrix.package }}
       lto: false
-      download-artifacts: false
     secrets: inherit
 
   #####################################################################
