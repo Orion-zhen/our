@@ -72,14 +72,14 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-      - name: Install yay
+      - name: Install paru
         run: |
           cd /tmp
-          git clone https://aur.archlinux.org/yay.git
-          cd yay
+          git clone https://aur.archlinux.org/paru.git
+          cd paru
           makepkg -si --noconfirm --noprogressbar
           cd ..
-          rm -rf yay
+          rm -rf paru
 
       - name: Download previously built dependencies
         if: ${{ inputs.download-artifacts }}

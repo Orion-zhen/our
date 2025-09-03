@@ -55,9 +55,9 @@ for REPO in "$@"; do
     # -s/--syncdeps: 会自动同步并安装 `depends` 和 `makedepends` 中缺失的依赖。
     # --noconfirm: 避免在安装依赖时需要手动确认。
     echo "--> Syncing dependencies for '$REPO'..."
-    if command -v yay &>/dev/null; then
-        echo "--> Using yay for dependency sync."
-        yay -S --noconfirm --overwrite '*' "$REPO"
+    if command -v paru &>/dev/null; then
+        echo "--> Using paru for dependency sync."
+        paru -S --noconfirm --overwrite '*' "$REPO"
     else
         echo "--> Using pacman for dependency sync."
         makepkg --syncdeps --noconfirm --noprogressbar
