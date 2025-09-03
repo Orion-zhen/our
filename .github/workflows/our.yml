@@ -16,6 +16,7 @@ on:
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
+    container: archlinux:latest
     outputs:
       packages: ${{ steps.set_matrix.outputs.packages }}
 
@@ -25,9 +26,8 @@ jobs:
 
       - name: Setup Python
         run: |
-          apt update -y
-          apt install -y python3 python3-pip
-          pip install --no-cache-dir --break-system-packages pyyaml
+          pacman -Syu --noconfirm --overwrite '*'
+          pacman -S --noconfirm --overwrite '*' python-pyyaml
 
       - name: Generate package list
         id: set_matrix
@@ -43,6 +43,7 @@ jobs:
 
   generate-matrix-no-lto:
     runs-on: ubuntu-latest
+    container: archlinux:latest
     outputs:
       packages: ${{ steps.set_matrix.outputs.packages }}
 
@@ -52,9 +53,8 @@ jobs:
 
       - name: Setup Python
         run: |
-          apt update -y
-          apt install -y python3 python3-pip
-          pip install --no-cache-dir --break-system-packages pyyaml
+          pacman -Syu --noconfirm --overwrite '*'
+          pacman -S --noconfirm --overwrite '*' python-pyyaml
 
       - name: Generate package list
         id: set_matrix
