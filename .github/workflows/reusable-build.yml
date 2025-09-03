@@ -36,7 +36,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: archlinux:latest
+      image: greyltc/archlinux-aur:yay
       options: --privileged # Required for system-level changes like useradd, pacman
     steps:
       - name: Checkout repository
@@ -104,12 +104,12 @@ jobs:
           echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
           pacman -Syu --noconfirm --overwrite '*'
 
-      - name: Create non-root user
-        run: |
-          useradd -m -G wheel builder
-          # Allow the 'builder' user to run any command with sudo without a password
-          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-          chown -R builder:builder .
+      # - name: Create non-root user
+      #   run: |
+      #     useradd -m -G wheel builder
+      #     # Allow the 'builder' user to run any command with sudo without a password
+      #     echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+      #     chown -R builder:builder .
 
       - name: Build AUR package
         env:
@@ -117,7 +117,7 @@ jobs:
           GPG_SIGN: ${{ inputs.gpg-sign }}
         # 调用脚本，只传递一个包
         run: |
-          sudo -E -u builder bash scripts/build-one.sh ${{ inputs.package }}
+          bash scripts/build-one.sh ${{ inputs.package }}
 
       - name: Rename files with illegal characters
         run: |
