@@ -106,9 +106,6 @@ jobs:
       #     chown -R builder:builder .
 
       - name: Build AUR package
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-          GPG_SIGN: ${{ inputs.gpg-sign }}
         # 调用脚本，只传递一个包
         run: |
           # bash scripts/build-one.sh ${{ inputs.package }}
@@ -147,11 +144,13 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: GPG Sign Packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
         if: ${{ inputs.gpg-sign }}
         run: |
           for pkg in *.zst; do
             echo "signing $pkg..."
-            gpg --detach-sign "$pkg"
+            gpg --local-user $GPG_SIG_KEY --detach-sign "$pkg"
           done
 
           echo "Every package is signed"
