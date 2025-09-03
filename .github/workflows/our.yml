@@ -14,31 +14,67 @@ on:
       - "configs/**"
 
 jobs:
-  standalone:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.set_matrix.outputs.packages }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        run: |
+          apt update -y
+          apt install -y python3 python3-pip
+          pip install --no-cache-dir --break-system-packages pyyaml
+
+      - name: Generate package list
+        id: set_matrix
+        run: |
+          PACKAGE_LIST=$(python3 scripts/list-tasks.py packages.yaml --lto)
+
+          if [[ "$PACKAGE_LIST" == "[]" ]]; then
+            echo "::notice::No packages found in '${{ env.PACKAGE_ROOT }}'. Workflow will end gracefully."
+          else
+            echo "Discovered packages: $PACKAGE_LIST"
+          fi
+          echo "packages=$PACKAGE_LIST" >> $GITHUB_OUTPUT
+
+  generate-matrix-no-lto:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.set_matrix.outputs.packages }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        run: |
+          apt update -y
+          apt install -y python3 python3-pip
+          pip install --no-cache-dir --break-system-packages pyyaml
+
+      - name: Generate package list
+        id: set_matrix
+        run: |
+          PACKAGE_LIST=$(python3 scripts/list-tasks.py packages.yaml --no-lto)
+
+          if [[ "$PACKAGE_LIST" == "[]" ]]; then
+            echo "::notice::No packages found in '${{ env.PACKAGE_ROOT }}'. Workflow will end gracefully."
+          else
+            echo "Discovered packages: $PACKAGE_LIST"
+          fi
+          echo "packages=$PACKAGE_LIST" >> $GITHUB_OUTPUT
+
+  build:
+    needs: generate-matrix
+    if: ${{ needs.generate-matrix.outputs.packages != '[]' }}
     strategy:
       fail-fast: false
       matrix:
-        # LTO-enabled packages
-        package:
-          - nodejs-gitmoji-cli
-          - pmount
-          # - mihomo-party
-          - fcitx5-skin-fluentdark-git
-          - fcitx5-skin-fluentlight-git
-          - hfd-git
-          - wsl-open
-          - wsl2-ssh-agent
-          - ascii-image-converter
-          - toolong
-          - nali-nt-git
-          - envfetch
-          - hyprls-git
-          - hyprshot-gui
-          - matugen-git
-          - clipse-git
-          - linux-wallpaperengine-git
-          - llama-swap
-          - slidev-cli
+        package: ${{ fromJson(needs.generate-matrix.outputs.packages) }}
     uses: ./.github/workflows/reusable-build.yml
     permissions:
       contents: write
@@ -48,12 +84,13 @@ jobs:
       download-artifacts: false
     secrets: inherit
 
-  standalone-no-lto:
+  build-no-lto:
+    needs: generate-matrix-no-lto
+    if: ${{ needs.generate-matrix-no-lto.outputs.packages != '[]' }}
     strategy:
       fail-fast: false
       matrix:
-        package:
-          - wezterm-git
+        package: ${{ fromJson(needs.generate-matrix-no-lto.outputs.packages) }}
     uses: ./.github/workflows/reusable-build.yml
     permissions:
       contents: write
@@ -61,130 +98,6 @@ jobs:
       package: ${{ matrix.package }}
       lto: false
       download-artifacts: false
-    secrets: inherit
-
-  stage-1:
-    strategy:
-      fail-fast: false
-      matrix:
-        # LTO-enabled packages
-        package:
-          - ckbcomp # depby: calamares-git
-          - google-breakpad # depby: quickshell-git
-          - python-safetensors # depby: python-transformers
-          - python-msgspec # depby: python-vllm-bin
-          - python-blake3 # depby: python-vllm-bin
-          ### libastal series for hyprpanel ###
-          - libastal-io-git
-          - libastal-apps-git
-          - libastal-auth-git
-          - libastal-battery-git
-          - libastal-bluetooth-git
-          - libastal-greetd-git
-          - libastal-hyprland-git
-          - libastal-mpris-git
-          - libastal-network-git
-          - libastal-notifd-git
-          - appmenu-glib-translator-git
-          - libastal-powerprofiles-git
-          - libastal-river-git
-          - libastal-wireplumber-git
-          ### End libastal ###
-    uses: ./.github/workflows/reusable-build.yml
-    permissions:
-      contents: write
-    with:
-      package: ${{ matrix.package }}
-      lto: true
-      download-artifacts: false
-    secrets: inherit
-
-  stage-1-no-lto:
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - libcava # depby: libastal-cava-git
-    uses: ./.github/workflows/reusable-build.yml
-    permissions:
-      contents: write
-    with:
-      package: ${{ matrix.package }}
-      lto: false
-      download-artifacts: false
-    secrets: inherit
-
-  stage-2:
-    needs: 
-      - stage-1
-      - stage-1-no-lto # Depend on both LTO and no-LTO groups
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - calamares-git # depon: ckbcomp
-          - quickshell-git # depon: google-breakpad
-          ### libastal series for hyprpanel ###
-          - libastal-git
-          - libastal-4-git
-          - libastal-cava-git
-          - libastal-tray-git
-          ### End libastal ###
-    uses: ./.github/workflows/reusable-build.yml
-    permissions:
-      contents: write
-    with:
-      package: ${{ matrix.package }}
-      lto: true
-      download-artifacts: true
-    secrets: inherit
-
-  stage-3:
-    needs: stage-2
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          ### libastal series for hyprpanel ###
-          - libastal-meta # depby: aylurs-gtk-shell-git
-          - libastal-gjs-git # depon: libastal-git | depby: aylurs-gtk-shell-git
-          ### End libastal ###
-    uses: ./.github/workflows/reusable-build.yml
-    permissions: { contents: write }
-    with:
-      package: ${{ matrix.package }}
-      lto: true
-      download-artifacts: true
-    secrets: inherit
-
-  stage-4:
-    needs: stage-3
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - aylurs-gtk-shell-git # depon: libastal-gjs-git, libastal-meta | depby: ags-hyprpanel-git
-    uses: ./.github/workflows/reusable-build.yml
-    permissions: { contents: write }
-    with:
-      package: ${{ matrix.package }}
-      lto: true
-      download-artifacts: true
-    secrets: inherit
-
-  stage-5:
-    needs: stage-4
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - ags-hyprpanel-git # depon: aylurs-gtk-shell-git
-    uses: ./.github/workflows/reusable-build.yml
-    permissions: { contents: write }
-    with:
-      package: ${{ matrix.package }}
-      lto: true
-      download-artifacts: true
     secrets: inherit
 
   #####################################################################
@@ -193,9 +106,8 @@ jobs:
   publish:
     name: Publish to Pages
     needs: # This transitively depends on all previous stages
-      - standalone
-      - standalone-no-lto
-      - stage-5
+      - build
+      - build-no-lto
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
