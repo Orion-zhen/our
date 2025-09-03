@@ -35,7 +35,7 @@ jobs:
           PACKAGE_LIST=$(python3 scripts/list-tasks.py packages.yaml --lto)
 
           if [[ "$PACKAGE_LIST" == "[]" ]]; then
-            echo "::notice::No packages found in '${{ env.PACKAGE_ROOT }}'. Workflow will end gracefully."
+            echo "::notice::No LTO packages found in the package list'. Workflow will end gracefully."
           else
             echo "Discovered packages: $PACKAGE_LIST"
           fi
@@ -62,7 +62,7 @@ jobs:
           PACKAGE_LIST=$(python3 scripts/list-tasks.py packages.yaml --no-lto)
 
           if [[ "$PACKAGE_LIST" == "[]" ]]; then
-            echo "::notice::No packages found in '${{ env.PACKAGE_ROOT }}'. Workflow will end gracefully."
+            echo "::notice::No non-LTO packages found in the package list'. Workflow will end gracefully."
           else
             echo "Discovered packages: $PACKAGE_LIST"
           fi
