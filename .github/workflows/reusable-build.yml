@@ -52,7 +52,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare build environment (No LTO)
@@ -61,7 +61,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare environment (Clean Build)
@@ -69,17 +69,17 @@ jobs:
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Install paru
         run: |
           cd /tmp
-          git clone https://aur.archlinux.org/paru.git
-          cd paru
+          git clone https://aur.archlinux.org/paru-bin.git
+          cd paru-bin
           makepkg -si --noconfirm --noprogressbar
           cd ..
-          rm -rf paru
+          rm -rf paru-bin
 
       - name: Download previously built dependencies
         if: ${{ inputs.download-artifacts }}
@@ -102,13 +102,20 @@ jobs:
           echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
           pacman -Syu --noconfirm --overwrite '*'
 
+      - name: Create non-root user
+        run: |
+          useradd -m -G wheel builder
+          # Allow the 'builder' user to run any command with sudo without a password
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chown -R builder:builder .
+
       - name: Build AUR package
         env:
           GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
           GPG_SIGN: ${{ inputs.gpg-sign }}
         # 调用脚本，只传递一个包
         run: |
-          bash scripts/build-one.sh ${{ inputs.package }}
+          sudo -E -u builder bash scripts/build-one.sh ${{ inputs.package }}
 
       - name: Rename files with illegal characters
         run: |
