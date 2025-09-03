@@ -108,10 +108,13 @@ jobs:
     needs: # This transitively depends on all previous stages
       - build
       - build-no-lto
+    # 使用 always() 来强制运行此条件判定
     if: >-
-      (needs.build.result == 'success' && needs.build-no-lto.result == 'skipped') ||
-      (needs.build.result == 'skipped' && needs.build-no-lto.result == 'success') ||
-      (needs.build.result == 'success' && needs.build-no-lto.result == 'success')
+      always() && (
+        (needs.build.result == 'success' && needs.build-no-lto.result == 'skipped') ||
+        (needs.build.result == 'skipped' && needs.build-no-lto.result == 'success') ||
+        (needs.build.result == 'success' && needs.build-no-lto.result == 'success')
+      )
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
