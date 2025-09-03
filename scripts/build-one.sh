@@ -55,15 +55,15 @@ for REPO in "$@"; do
     # -s/--syncdeps: 会自动同步并安装 `depends` 和 `makedepends` 中缺失的依赖。
     # --noconfirm: 避免在安装依赖时需要手动确认。
     echo "--> Syncing dependencies for '$REPO'..."
-    # if command -v  &>/dev/null; then
-    #     echo "--> Using yay for dependency sync."
-    #     source "$REPO/PKGBUILD"
-    #     yay -S ${makedepends[*]} ${depends[*]} --needed --noconfirm --mflags "--nocheck --skippgpcheck"
-    # else
-    #     echo "--> Using pacman for dependency sync."
-    #     makepkg --syncdeps --noconfirm --noprogressbar
-    # fi
-    aur-install "$REPO"
+    if command -v aur-install &>/dev/null; then
+        echo "--> Using AUR helper for dependency sync."
+        source "$REPO/PKGBUILD"
+        echo "Setupping dependencies for '$REPO'..."
+        aur-install ${makedepends[*]} ${depends[*]}
+    else
+        echo "--> Using pacman for dependency sync."
+        makepkg --syncdeps --noconfirm --noprogressbar
+    fi
 
     # --- 构建包 ---
     # -f/--force: 即使包已经存在，也强制重新构建。
