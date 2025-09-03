@@ -52,7 +52,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare build environment (No LTO)
@@ -61,7 +61,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare environment (Clean Build)
@@ -69,8 +69,17 @@ jobs:
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
+
+      - name: Install yay
+        run: |
+          cd /tmp
+          git clone https://aur.archlinux.org/yay.git
+          cd yay
+          makepkg -si --noconfirm --noprogressbar
+          cd ..
+          rm -rf yay
 
       - name: Download previously built dependencies
         if: ${{ inputs.download-artifacts }}
