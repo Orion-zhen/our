@@ -42,12 +42,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
       - name: Prepare build environment
         if: ${{ inputs.lto && !inputs.clean-build }}
         run: |
@@ -144,6 +138,13 @@ jobs:
       - name: Rename files with illegal characters
         run: |
           find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Import GPG key
+        if: ${{ inputs.gpg-sign }}
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: GPG Sign Packages
         if: ${{ inputs.gpg-sign }}
