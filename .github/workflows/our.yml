@@ -86,7 +86,7 @@ jobs:
 
   build-no-lto:
     needs: generate-matrix-no-lto
-    # if: ${{ needs.generate-matrix-no-lto.outputs.packages != '[]' }}
+    if: ${{ needs.generate-matrix-no-lto.outputs.packages != '[]' }}
     strategy:
       fail-fast: false
       matrix:
@@ -108,7 +108,10 @@ jobs:
     needs: # This transitively depends on all previous stages
       - build
       - build-no-lto
-    if: (needs.build.result == 'success' || needs.build-no-lto.result == 'success')
+    if: >-
+      (needs.build.result == 'success' && needs.build-no-lto.result == 'skipped') ||
+      (needs.build.result == 'skipped' && needs.build-no-lto.result == 'success') ||
+      (needs.build.result == 'success' && needs.build-no-lto.result == 'success')
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
