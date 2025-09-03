@@ -35,7 +35,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: "archlinux:latest"
+    container:
+      image: archlinux:latest
+      options: --privileged # Required for system-level changes like useradd, pacman
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
