@@ -1,0 +1,66 @@
+packages:
+- name: ags-hyprpanel-git
+  dependencies:
+  - name: aylurs-gtk-shell-git
+    dependencies:
+    - name: libastal-git
+      dependencies:
+      - name: libastal-io-git
+    - name: libastal-4-git
+      dependencies:
+      - name: libastal-io-git
+    - name: libastal-io-git
+  - name: libastal-gjs-git
+    dependencies:
+    - name: libastal-git
+      dependencies:
+      - name: libastal-io-git
+    - name: libastal-io-git
+  - name: libastal-meta
+    dependencies:
+    - name: libastal-git
+      dependencies:
+      - name: libastal-io-git
+    - name: libastal-4-git
+      dependencies:
+      - name: libastal-io-git
+    - name: libastal-apps-git
+    - name: libastal-auth-git
+    - name: libastal-battery-git
+    - name: libastal-bluetooth-git
+    - name: libastal-cava-git
+      dependencies:
+      - name: libcava
+    - name: libastal-greetd-git
+    - name: libastal-hyprland-git
+    - name: libastal-io-git
+    - name: libastal-mpris-git
+    - name: libastal-network-git
+    - name: libastal-notifd-git
+    - name: libastal-powerprofiles-git
+    - name: libastal-river-git
+    - name: libastal-tray-git
+      dependencies:
+      - name: appmenu-glib-translator-git
+    - name: libastal-wireplumber-git
+- name: ascii-image-converter
+- name: calamares-git
+  dependencies:
+  - name: ckbcomp
+- name: clipse-git
+- name: envfetch
+- name: fcitx5-skin-fluentdark-git
+- name: fcitx5-skin-fluentlight-git
+- name: hfd-git
+- name: hyprls-git
+- name: hyprshot-gui
+- name: linux-wallpaperengine-git
+- name: llama-swap
+- name: matugen-git
+- name: nali-nt-git
+- name: nodejs-gitmoji-cli
+- name: pmount
+- name: slidev-cli
+- name: toolong
+- name: wsl-open
+- name: wsl2-ssh-agent
