@@ -151,8 +151,7 @@ jobs:
 
       - name: Generate package index page
         run: |
-          pacman -Syu python python-pip --noconfirm --overwrite '*'
-          pip install zstandard --break-system-packages
+          pacman -Syu python python-pip python-zstandard --noconfirm --overwrite '*'
           python scripts/packages.py
 
       - name: Setup GitHub Pages
