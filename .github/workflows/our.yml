@@ -108,6 +108,7 @@ jobs:
     needs: # This transitively depends on all previous stages
       - build
       - build-no-lto
+    if: (needs.build.result == 'success' || needs.build-no-lto.result == 'success')
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
