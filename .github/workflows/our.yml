@@ -10,8 +10,8 @@ on:
     paths:
       - ".github/workflows/our.yml"
       - ".github/workflows/reusable-build.yml"
-      - "scripts/**"
       - "configs/**"
+      - "packages.yaml"
 
 jobs:
   generate-matrix:
@@ -168,24 +168,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  # publish-to-hf:
-  #   name: Publish to Hugging Face
-  #   needs: # This transitively depends on all previous stages
-  #     - standalone
-  #     - standalone-no-lto
-  #     - stage-5
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Download all built packages
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: .
-  #         merge-multiple: true
-
-  #     - name: Release to Hugging Face
-  #       env:
-  #         HF_TOKEN: ${{ secrets.HF_TOKEN }}
-  #       run: |
-  #         pip install -U "huggingface_hub[cli]"
-  #         huggingface-cli upload --repo-type model Orion-zhen/our . . --commit-message "Publish latest packages"
