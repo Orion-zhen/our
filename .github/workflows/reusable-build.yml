@@ -8,10 +8,6 @@ on:
         description: The package to build
         required: true
         type: string
-      download-artifacts:
-        description: Whether to download artifacts from previous jobs
-        required: true
-        type: boolean
       lto:
         description: Enable LTO
         default: true
@@ -35,16 +31,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: "archlinux:latest"
+    container:
+      image: greyltc/archlinux-aur:yay
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Prepare build environment
         if: ${{ inputs.lto && !inputs.clean-build }}
@@ -52,7 +43,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg.conf >> /etc/makepkg.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare build environment (No LTO)
@@ -61,7 +52,7 @@ jobs:
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           cat ./configs/makepkg-no-lto.conf >> /etc/makepkg.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
       - name: Prepare environment (Clean Build)
@@ -69,41 +60,58 @@ jobs:
         run: |
           sed -i '/VerbosePkgLists/d' /etc/pacman.conf
           # cat ./configs/pacman.conf >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold openmp openmpi tree
+          pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-      - name: Download previously built dependencies
-        if: ${{ inputs.download-artifacts }}
-        id: download-deps
-        uses: actions/download-artifact@v4
-        with:
-          path: x86_64
-          merge-multiple: true
-
-      - name: Setup local repo for dependencies
-        if: ${{ inputs.download-artifacts && steps.download-deps.outputs.download-path }}
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-          GPG_SIGN: ${{ inputs.gpg-sign }}
-        run: |
-          echo "--- Setting up local repo with downloaded packages ---"
-          bash scripts/repo-add.sh our-tmp
-          echo "[our-tmp]" >> /etc/pacman.conf
-          echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf
-          echo "Server = file://$(pwd)/x86_64" >> /etc/pacman.conf
-          pacman -Syu --noconfirm --overwrite '*'
-
       - name: Build AUR package
-        env:
-          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
-          GPG_SIGN: ${{ inputs.gpg-sign }}
         # 调用脚本，只传递一个包
         run: |
-          bash scripts/build-one.sh ${{ inputs.package }}
+          # bash scripts/build-one.sh ${{ inputs.package }}
+          # 来自 docker image
+          aur-install ${{ inputs.package }}
+
+      - name: Gather Build Results
+        run: |
+          # /var/cache/foreign-pkg 是 aur-install 放置构建的包的地方
+          find /var/cache/foreign-pkg -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "./" \;
+
+          # 检查是否真的有包被移动了过来
+          # `ls` 的结果通过 `wc -l` 计数，如果不为 0，说明成功了
+          if [ $(ls -1 ${REPO}*.pkg.tar.zst 2>/dev/null | wc -l) -eq 0 ]; then
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              echo "!!! Critical Error: Build for '$REPO' did not produce any package files."
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              exit 1
+          fi
+
+          echo "================================================="
+          echo "All packages built successfully!"
+          echo "Final packages in current directory:"
+          ls -l *.pkg.tar.zst*
+          echo "================================================="
 
       - name: Rename files with illegal characters
         run: |
           find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: Import GPG key
+        if: ${{ inputs.gpg-sign }}
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: GPG Sign Packages
+        env:
+          GPG_SIG_KEY: ${{ secrets.GPG_SIG_KEY }}
+        if: ${{ inputs.gpg-sign }}
+        run: |
+          for pkg in *.zst; do
+            echo "signing $pkg..."
+            gpg --local-user $GPG_SIG_KEY --detach-sign "$pkg"
+          done
+
+          echo "Every package is signed"
       
       - name: Upload built package
         uses: actions/upload-artifact@v4
