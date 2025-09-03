@@ -117,11 +117,43 @@ jobs:
           GPG_SIGN: ${{ inputs.gpg-sign }}
         # 调用脚本，只传递一个包
         run: |
-          bash scripts/build-one.sh ${{ inputs.package }}
+          # bash scripts/build-one.sh ${{ inputs.package }}
+          # 来自 docker image
+          aur-install ${{ inputs.package }}
+
+      - name: Gather Build Results
+        run: |
+          # /var/cache/foreign-pkg 是 aur-install 放置构建的包的地方
+          find /var/cache/foreign-pkg -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "./" \;
+
+          # 检查是否真的有包被移动了过来
+          # `ls` 的结果通过 `wc -l` 计数，如果不为 0，说明成功了
+          if [ $(ls -1 ${REPO}*.pkg.tar.zst 2>/dev/null | wc -l) -eq 0 ]; then
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              echo "!!! Critical Error: Build for '$REPO' did not produce any package files."
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              exit 1
+          fi
+
+          echo "================================================="
+          echo "All packages built successfully!"
+          echo "Final packages in current directory:"
+          ls -l *.pkg.tar.zst*
+          echo "================================================="
 
       - name: Rename files with illegal characters
         run: |
           find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+      - name: GPG Sign Packages
+        if: ${{ inputs.gpg-sign }}
+        run: |
+          for pkg in *.zst; do
+            echo "signing $pkg..."
+            gpg --detach-sign "$pkg"
+          done
+
+          echo "Every package is signed"
       
       - name: Upload built package
         uses: actions/upload-artifact@v4
