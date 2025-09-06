@@ -28,9 +28,6 @@ on:
       GPG_SIG_KEY:
         required: true
 
-env:
-  CI: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -71,7 +68,8 @@ jobs:
         run: |
           # bash scripts/build-one.sh ${{ inputs.package }}
           # 来自 docker image
-          aur-install ${{ inputs.package }}
+          # 显式指定 CI=true
+          CI=true aur-install ${{ inputs.package }}
 
       - name: Gather Build Results
         run: |
