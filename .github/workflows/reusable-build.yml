@@ -28,6 +28,9 @@ on:
       GPG_SIG_KEY:
         required: true
 
+env:
+  CI: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
