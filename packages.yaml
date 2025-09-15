@@ -48,13 +48,14 @@ packages:
   dependencies:
   - name: ckbcomp
 - name: clipse-git
+- name: cmd-wrapped
 - name: envfetch
 - name: fcitx5-skin-fluentdark-git
 - name: fcitx5-skin-fluentlight-git
+- name: fuck-u-code-git
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
-# - name: linux-wallpaperengine-git
 - name: llama-swap
 - name: matugen-git
 - name: nali-nt-git
