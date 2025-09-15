@@ -54,7 +54,7 @@ packages:
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
-- name: linux-wallpaperengine-git
+# - name: linux-wallpaperengine-git
 - name: llama-swap
 - name: matugen-git
 - name: nali-nt-git
