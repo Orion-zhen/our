@@ -59,6 +59,7 @@ packages:
 - name: llama-swap
 - name: matugen-git
 - name: nali-nt-git
+- name: niriswitcher
 - name: nodejs-gitmoji-cli
 - name: pmount
 - name: toolong
