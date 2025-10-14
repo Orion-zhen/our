@@ -61,8 +61,8 @@ packages:
 - name: nali-nt-git
 - name: niriswitcher
 - name: nodejs-gitmoji-cli
-- name: plasma6-wallpapers-wallpaper-engine-git
 - name: pmount
 - name: toolong
+- name: vicinae
 - name: wsl-open
 - name: wsl2-ssh-agent
