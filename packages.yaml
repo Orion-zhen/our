@@ -49,6 +49,7 @@ packages:
   - name: ckbcomp
 - name: clipse-git
 - name: cmd-wrapped
+- name: dms-shell-niri
 - name: envfetch
 - name: fcitx5-skin-fluentdark-git
 - name: fcitx5-skin-fluentlight-git
