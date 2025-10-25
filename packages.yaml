@@ -1,48 +1,4 @@
 packages:
-- name: ags-hyprpanel-git
-  dependencies:
-  - name: aylurs-gtk-shell-git
-    dependencies:
-    - name: libastal-git
-      dependencies:
-      - name: libastal-io-git
-    - name: libastal-4-git
-      dependencies:
-      - name: libastal-io-git
-    - name: libastal-io-git
-  - name: libastal-gjs-git
-    dependencies:
-    - name: libastal-git
-      dependencies:
-      - name: libastal-io-git
-    - name: libastal-io-git
-  - name: libastal-meta
-    dependencies:
-    - name: libastal-git
-      dependencies:
-      - name: libastal-io-git
-    - name: libastal-4-git
-      dependencies:
-      - name: libastal-io-git
-    - name: libastal-apps-git
-    - name: libastal-auth-git
-    - name: libastal-battery-git
-    - name: libastal-bluetooth-git
-    - name: libastal-cava-git
-      dependencies:
-      - name: libcava
-    - name: libastal-greetd-git
-    - name: libastal-hyprland-git
-    - name: libastal-io-git
-    - name: libastal-mpris-git
-    - name: libastal-network-git
-    - name: libastal-notifd-git
-    - name: libastal-powerprofiles-git
-    - name: libastal-river-git
-    - name: libastal-tray-git
-      dependencies:
-      - name: appmenu-glib-translator-git
-    - name: libastal-wireplumber-git
 - name: ascii-image-converter
 - name: calamares-git
   dependencies:
@@ -61,9 +17,16 @@ packages:
 - name: matugen-git
 - name: nali-nt-git
 - name: niriswitcher
+- name: nirius
+- name: niri-git
+  lto: false
 - name: nodejs-gitmoji-cli
 - name: pmount
 - name: toolong
+- name: ttf-lxgw-neo-xihei-plus
+- name: ttf-lxgw-wenkai-nerd
+- name: ttf-ms-win11-auto-zh_cn
 - name: vicinae
 - name: wsl-open
 - name: wsl2-ssh-agent
+- name: zen-browser-bin
