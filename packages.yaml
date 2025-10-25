@@ -11,6 +11,7 @@ packages:
 - name: fcitx5-skin-fluentlight-git
 - name: fuck-u-code-git
 - name: hfd-git
+- name: hoppscotch-bin
 - name: hyprls-git
 - name: hyprshot-gui
 - name: llama-swap
