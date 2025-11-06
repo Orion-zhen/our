@@ -19,6 +19,7 @@ packages:
 - name: hyprshot-gui
 - name: llama-swap
 - name: matugen-git
+- name: mihomo-party
 - name: nali-nt-git
 - name: niriswitcher
 - name: nirius
