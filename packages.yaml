@@ -1,5 +1,6 @@
 packages:
 - name: ascii-image-converter
+- name: amdvlk-bin
 - name: calamares-git
   dependencies:
   - name: ckbcomp
