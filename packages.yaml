@@ -1,6 +1,6 @@
 packages:
-- name: ascii-image-converter
 - name: amdvlk-bin
+- name: ascii-image-converter
 - name: calamares-git
   dependencies:
   - name: ckbcomp
@@ -14,6 +14,7 @@ packages:
 - name: fcitx5-themes-candlelight
 - name: fcitx5-theme-wechat
 - name: fuck-u-code-git
+- name: grub-theme-minegrub-git
 - name: hfd-git
 - name: hoppscotch-bin
 - name: hyprls-git
