@@ -37,4 +37,5 @@ packages:
 - name: winboat
 - name: wsl-open
 - name: wsl2-ssh-agent
+- name: xwayland-satellite-git
 - name: zen-browser-bin
