@@ -79,8 +79,9 @@ jobs:
 
       - name: Install yay
         run: |
-          su builder -c "git clone --depth 1 https://aur.archlinux.org/yay-bin.git"
-          su builder "cd yay-bin"
+          git clone --depth 1 https://aur.archlinux.org/yay-bin.git
+          chown -R builder:builder yay-bin
+          cd yay-bin
           su builder -c "makepkg -si --noconfirm --noprogressbar"
           rm yay-bin
 
