@@ -83,7 +83,8 @@ jobs:
           chown -R builder:builder yay-bin
           cd yay-bin
           su builder -c "makepkg -si --noconfirm --noprogressbar"
-          rm yay-bin
+          cd ..
+          rm -rf yay-bin
 
           # makepkg 中把 PKGDEST 设置为了 /var/cache/makepkg/pkg
           # 这里应该清除 yay 自己的包, 以防止移动多余的包
