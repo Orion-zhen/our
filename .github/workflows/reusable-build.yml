@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
+      options: --privileged
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
