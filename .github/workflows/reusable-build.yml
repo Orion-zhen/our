@@ -73,9 +73,9 @@ jobs:
           chown -R builder:builder .
 
           # 创建 yay 缓存目录
-          mkdir -p /var/cache/makepkg/pkg
+          mkdir -p /var/cache/makepkg
           # 授予权限
-          chown -R builder:builder /var/cache/makepkg/pkg
+          chown -R builder:builder /var/cache/makepkg
 
       - name: Install yay
         run: |
