@@ -32,7 +32,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: greyltc/archlinux-aur:yay
+      image: archlinux:latest
+      options: --privileged
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,33 +64,59 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
+      - name: Setup build user
+        run: |
+          useradd -m builder
+          # 配置sudo 免密
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          # 授予当前目录写入权限
+          chown -R builder:builder .
+
+          # 创建 yay 缓存目录
+          mkdir -p /var/cache/makepkg
+          # 授予权限
+          chown -R builder:builder /var/cache/makepkg
+
+      - name: Install yay
+        run: |
+          git clone --depth 1 https://aur.archlinux.org/yay-bin.git
+          chown -R builder:builder yay-bin
+          cd yay-bin
+          su builder -c "makepkg -si --noconfirm --noprogressbar"
+          cd ..
+          rm -rf yay-bin
+
+          # makepkg 中把 PKGDEST 设置为了 /var/cache/makepkg/pkg
+          # 这里应该清除 yay 自己的包, 以防止移动多余的包
+          rm -rf /var/cache/makepkg/pkg
+
       - name: Build AUR package
         # 调用脚本，只传递一个包
         run: |
-          # bash scripts/build-one.sh ${{ inputs.package }}
+          # 注意: 需要手动重置 HOME，否则它会保留 /root，导致权限错误
+          sudo -E -u builder HOME=/home/builder bash scripts/build-one.sh ${{ inputs.package }}
           # 来自 docker image
-          # 显式指定 CI=true
-          CI=true aur-install ${{ inputs.package }}
+          # aur-install ${{ inputs.package }}
 
-      - name: Gather Build Results
-        run: |
-          # /var/cache/foreign-pkg 是 aur-install 放置构建的包的地方
-          find /var/cache/foreign-pkg -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "./" \;
+      # - name: Gather Build Results
+      #   run: |
+      #     # /var/cache/foreign-pkg 是 aur-install 放置构建的包的地方
+      #     find /var/cache/foreign-pkg -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "./" \;
 
-          # 检查是否真的有包被移动了过来
-          # `ls` 的结果通过 `wc -l` 计数，如果不为 0，说明成功了
-          if [ $(ls -1 ${REPO}*.pkg.tar.zst 2>/dev/null | wc -l) -eq 0 ]; then
-              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-              echo "!!! Critical Error: Build for '$REPO' did not produce any package files."
-              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-              exit 1
-          fi
+      #     # 检查是否真的有包被移动了过来
+      #     # `ls` 的结果通过 `wc -l` 计数，如果不为 0，说明成功了
+      #     if [ $(ls -1 ${REPO}*.pkg.tar.zst 2>/dev/null | wc -l) -eq 0 ]; then
+      #         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+      #         echo "!!! Critical Error: Build for '$REPO' did not produce any package files."
+      #         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+      #         exit 1
+      #     fi
 
-          echo "================================================="
-          echo "All packages built successfully!"
-          echo "Final packages in current directory:"
-          ls -l *.pkg.tar.zst*
-          echo "================================================="
+      #     echo "================================================="
+      #     echo "All packages built successfully!"
+      #     echo "Final packages in current directory:"
+      #     ls -l *.pkg.tar.zst*
+      #     echo "================================================="
 
       - name: Rename files with illegal characters
         run: |
