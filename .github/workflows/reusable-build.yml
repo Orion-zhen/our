@@ -74,10 +74,18 @@ jobs:
           # 这里应该清除 yay 自己的包, 以防止移动多余的包
           rm -rf /var/cache/makepkg/pkg
 
+      - name: Setup build user
+        run: |
+          useradd -m builder
+          # 配置sudo 免密
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          # 授予当前目录写入权限
+          chown -R builder:builder .
+
       - name: Build AUR package
         # 调用脚本，只传递一个包
         run: |
-          bash scripts/build-one.sh ${{ inputs.package }}
+          su builder -c "bash scripts/build-one.sh ${{ inputs.package }}"
           # 来自 docker image
           # aur-install ${{ inputs.package }}
 
