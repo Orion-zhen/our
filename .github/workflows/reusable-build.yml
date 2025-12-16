@@ -32,7 +32,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: greyltc/archlinux-aur:yay
+      image: archlinux:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -71,6 +71,12 @@ jobs:
 
           # 确保环境变量可用
           sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
+
+      - name: Install yay
+        run: |
+          git clone --depth 1 https://aur.archlinux.org/yay.git
+          cd yay
+          makepkg -si --noconfirm --noprogressbar
 
       - name: Build AUR package
         # 调用脚本，只传递一个包
