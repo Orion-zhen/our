@@ -93,7 +93,8 @@ jobs:
       - name: Build AUR package
         # 调用脚本，只传递一个包
         run: |
-          su builder -c "bash scripts/build-one.sh ${{ inputs.package }}"
+          # 注意: 需要手动重置 HOME，否则它会保留 /root，导致权限错误
+          sudo -E -u builder HOME=/home/builder bash scripts/build-one.sh ${{ inputs.package }}
           # 来自 docker image
           # aur-install ${{ inputs.package }}
 
