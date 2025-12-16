@@ -46,9 +46,6 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-          # 确保环境变量可用
-          sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
-
       - name: Prepare build environment (No LTO)
         if: ${{ !inputs.lto && !inputs.clean-build }}
         run: |
@@ -58,9 +55,6 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
-          # 确保环境变量可用
-          sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
-
       - name: Prepare environment (Clean Build)
         if: ${{ inputs.clean-build }}
         run: |
@@ -68,9 +62,6 @@ jobs:
           # cat ./configs/pacman.conf >> /etc/pacman.conf
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
-
-          # 确保环境变量可用
-          sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
 
       - name: Install yay
         run: |
