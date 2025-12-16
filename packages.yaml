@@ -1,5 +1,4 @@
 packages:
-- name: amdvlk-bin
 - name: ascii-image-converter
 - name: calamares-git
   dependencies:
@@ -19,10 +18,10 @@ packages:
 - name: hoppscotch-bin
 - name: hyprls-git
 - name: hyprshot-gui
+- name: llama.cpp-vlukan
 - name: llama-swap
 - name: matugen-git
 - name: mihomo-party
-- name: nali-nt-git
 - name: niriswitcher
 - name: nirius
 - name: niri-git
