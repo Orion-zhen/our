@@ -60,7 +60,7 @@ for REPO in "$@"; do
     # 2. 使用 AUR 中的 PKGBUILD, 则使用 yay 构建, 并用 pacman 查找所有非源中的包并移动
     else
         echo "--> No local package found. Building '$REPO' from AUR."
-        yay -S --noconfirm --noprogressbar --overrite '*' "$REPO"
+        yay -S --noconfirm --noprogressbar --overwrite '*' "$REPO"
 
         echo "--> Moving built packages to root directory..."
         # 2. 使用 yay 构建的包
