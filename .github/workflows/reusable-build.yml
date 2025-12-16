@@ -46,6 +46,9 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
+          # 确保环境变量可用
+          sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
+
       - name: Prepare build environment (No LTO)
         if: ${{ !inputs.lto && !inputs.clean-build }}
         run: |
@@ -55,6 +58,9 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
+          # 确保环境变量可用
+          sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
+
       - name: Prepare environment (Clean Build)
         if: ${{ inputs.clean-build }}
         run: |
@@ -63,13 +69,15 @@ jobs:
           pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree
           sed -i '/E_ROOT/d' /usr/bin/makepkg
 
+          # 确保环境变量可用
+          sed -i 's/sudo -u/sudo -E -u/g' /bin/aur-install
+
       - name: Build AUR package
         # 调用脚本，只传递一个包
         run: |
           # bash scripts/build-one.sh ${{ inputs.package }}
           # 来自 docker image
-          # 显式指定 CI=true
-          CI=true aur-install ${{ inputs.package }}
+          aur-install ${{ inputs.package }}
 
       - name: Gather Build Results
         run: |
