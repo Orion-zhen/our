@@ -1,8 +1,10 @@
 packages:
+- name: antigravity
 - name: ascii-image-converter
 - name: calamares-git
   dependencies:
   - name: ckbcomp
+- name: cherry-studio
 - name: clipse-git
 - name: cmd-wrapped
 - name: dms-shell-niri
