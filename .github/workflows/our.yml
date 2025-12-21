@@ -107,12 +107,14 @@ jobs:
       - build
       - build-no-lto
     # 使用 always() 来强制运行此条件判定
-    if: >-
-      always() && (
-        (needs.build.result == 'success' && needs.build-no-lto.result == 'skipped') ||
-        (needs.build.result == 'skipped' && needs.build-no-lto.result == 'success') ||
-        (needs.build.result == 'success' && needs.build-no-lto.result == 'success')
-      )
+    # if: >-
+    #   always() && (
+    #     (needs.build.result == 'success' && needs.build-no-lto.result == 'skipped') ||
+    #     (needs.build.result == 'skipped' && needs.build-no-lto.result == 'success') ||
+    #     (needs.build.result == 'success' && needs.build-no-lto.result == 'success')
+    #   )
+    # 不管构建成功多少失败多少, 总是发布
+    if: always()
     runs-on: ubuntu-latest
     container: "archlinux:latest"
     permissions:
