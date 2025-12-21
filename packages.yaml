@@ -18,6 +18,7 @@ packages:
 - name: hyprls-git
 - name: hyprshot-gui
 - name: llama.cpp-vulkan
+- name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
 - name: mihomo-party
