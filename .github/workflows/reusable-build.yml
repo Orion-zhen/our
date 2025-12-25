@@ -53,6 +53,7 @@ jobs:
           docker run --privileged --rm \
             -v "${{ github.workspace }}:/work" \
             -w /work \
+            -e CI=1 \
             -e INPUT_LTO="${{ inputs.lto }}" \
             -e INPUT_CLEAN_BUILD="${{ inputs.clean-build }}" \
             archlinux:latest \
