@@ -59,6 +59,11 @@ jobs:
             archlinux:latest \
             /bin/bash -c "chmod +x scripts/entrypoint.sh && ./scripts/entrypoint.sh ${{ inputs.package }}"
 
+      - name: Fix Permissions
+        if: always()
+        run: |
+          sudo chown -R $USER:$USER .
+
       - name: Import GPG key
         if: ${{ inputs.gpg-sign }}
         uses: crazy-max/ghaction-import-gpg@v6
