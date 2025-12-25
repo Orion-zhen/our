@@ -17,6 +17,7 @@ packages:
 - name: hoppscotch-bin
 - name: hyprls-git
 - name: hyprshot-gui
+- name: llama.cpp-hip
 - name: llama.cpp-vulkan
 - name: llama-swap
 - name: llama-swap-bin
