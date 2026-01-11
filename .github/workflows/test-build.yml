@@ -19,6 +19,11 @@ on:
         description: Build without any extra config
         default: false
         type: boolean
+      custom-env:
+        description: Custom environment variables (one per line, KEY=VALUE format)
+        required: false
+        type: string
+        default: ""
 
 jobs:
   test-build:
@@ -28,4 +33,5 @@ jobs:
       lto: ${{ inputs.lto }}
       gpg-sign: ${{ inputs.gpg-sign }}
       clean-build: ${{ inputs.clean-build }}
+      custom-env: ${{ inputs.custom-env }}
     secrets: inherit
