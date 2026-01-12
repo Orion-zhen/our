@@ -157,7 +157,7 @@ jobs:
           python scripts/packages.py
 
       - name: Install npm dependencies
-        run: npm ci && npm install
+        run: npm install && npm ci
 
       - name: Build website
         run: npm run build
