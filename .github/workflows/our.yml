@@ -153,17 +153,11 @@ jobs:
 
       - name: Generate package index page
         run: |
-          pacman -Syu python python-pip python-zstandard --noconfirm --overwrite '*'
+          pacman -Syu python python-pip python-zstandard nodejs npm --noconfirm --overwrite '*'
           python scripts/packages.py
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "latest"
-          cache: "npm"
-
       - name: Install npm dependencies
-        run: npm ci
+        run: npm ci && npm install
 
       - name: Build website
         run: npm run build
