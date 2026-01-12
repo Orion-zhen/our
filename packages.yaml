@@ -1,7 +1,6 @@
 packages:
 - name: antigravity
 - name: ascii-image-converter
-- name: cherry-studio
 - name: clipse-git
 - name: cmd-wrapped
 - name: dms-shell-niri
