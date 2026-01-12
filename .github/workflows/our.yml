@@ -156,13 +156,34 @@ jobs:
           pacman -Syu python python-pip python-zstandard --noconfirm --overwrite '*'
           python scripts/packages.py
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "latest"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Prepare deployment
+        run: |
+          # Copy packages data and x86_64 directory to build output
+          cp packages.json build/
+          cp -r x86_64 build/
+
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          # path: "."
+          path: "build"
 
       - name: Deploy to GitHub Pages
         id: deployment
