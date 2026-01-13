@@ -18,9 +18,9 @@ If you want some nice packages in AUR, just feel free to issue 🤗
 - ✅ Signed with my GPG key
 - ✅ Built and released everyday to ensure the latest packages
 - ✅ Backup sources on Huggingface and HF-Mirror
-- ✅ Completely **FREE** to community with GPL-v3.0 license<sup>*</sup>
+- ✅ Completely **FREE** to community with GPL-v3.0 license<sup>\*</sup>
 
-> <sup>*</sup>: Only all code and files in this repository are licensed under the GPL v3.0 license, while all repositories referenced by `PKGBUILD` files, and the packages built from these repositories, are released under their respective repository licenses.
+> <sup>\*</sup>: Only all code and files in this repository are licensed under the GPL v3.0 license, while all repositories referenced by `PKGBUILD` files, and the packages built from these repositories, are released under their respective repository licenses.
 
 ## Usage
 
