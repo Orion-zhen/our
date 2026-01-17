@@ -32,6 +32,7 @@ packages:
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
 - name: ttf-ms-win11-auto-zh_cn
+- name: tex-fmt
 - name: vicinae
 - name: winboat
 - name: wsl-open
