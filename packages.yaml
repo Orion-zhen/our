@@ -27,6 +27,7 @@ packages:
 #   lto: false
 - name: nodejs-gitmoji-cli
 - name: pmount
+- name: protonplus
 - name: python-gguf
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
