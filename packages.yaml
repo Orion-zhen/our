@@ -1,4 +1,5 @@
 packages:
+- name: activate-linux-git
 - name: antigravity
 - name: ascii-image-converter
 - name: clipse-git
@@ -36,7 +37,7 @@ packages:
 - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
-- name: winboat
+# - name: winboat
 - name: wsl-open
 - name: wsl2-ssh-agent
 - name: zen-browser-bin
