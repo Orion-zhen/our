@@ -12,7 +12,7 @@ sed -i '/VerbosePkgLists/d' /etc/pacman.conf
 
 # 安装基础依赖
 # 注意：先刷新 keys 和系统，确保环境是最新的
-pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree wayland wayland-protocols pango
+pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold python-pyyaml sudo tree wayland wayland-protocols pango nss nspr at-spi2-core libcups libxcomposite libxdamage
 
 # patch makepkg 允许 root 运行 (虽然我们在下面会创建 builder 用户，但这一步通常是为了兼容性或特殊操作)
 sed -i '/E_ROOT/d' /usr/bin/makepkg
