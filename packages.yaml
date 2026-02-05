@@ -1,5 +1,7 @@
 packages:
 - name: activate-linux-git
+  dependencies:
+  - pango
 - name: antigravity
 - name: ascii-image-converter
 - name: clipse-git
@@ -18,6 +20,15 @@ packages:
 - name: hyprls-git
 - name: hyprshot-gui
 - name: linux-wallpaperengine-git
+  dependencies:
+  - at-spi2-core
+  - libcups
+  - libxcomposite
+  - libxdamage
+  - nspr
+  - nss
+  - wayland
+  - wayland-protocols
 # - name: llama.cpp-hip
 - name: llama-swap
 - name: llama-swap-bin
