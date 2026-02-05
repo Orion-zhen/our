@@ -18,7 +18,7 @@ packages:
 - name: hyprls-git
 - name: hyprshot-gui
 - name: linux-wallpaperengine-git
-- name: llama.cpp-hip
+# - name: llama.cpp-hip
 - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
