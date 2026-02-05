@@ -5,7 +5,7 @@ set -e
 # 1. 基础环境准备 (所有情况通用)
 # ==============================
 echo "================================================="
-echo ">> [1/5] Preparing base environment..."
+echo ">> [1/6] Preparing base environment..."
 
 # 移除 pacman.conf 中的 VerbosePkgLists 以减少日志噪音
 sed -i '/VerbosePkgLists/d' /etc/pacman.conf
@@ -21,7 +21,7 @@ sed -i '/E_ROOT/d' /usr/bin/makepkg
 # 2. 配置 makepkg.conf (核心逻辑)
 # ==============================
 echo "================================================="
-echo ">> [2/5] Configuring makepkg..."
+echo ">> [2/6] Configuring makepkg..."
 echo "   INPUT_LTO: ${INPUT_LTO}"
 echo "   INPUT_CLEAN_BUILD: ${INPUT_CLEAN_BUILD}"
 
@@ -50,7 +50,7 @@ fi
 # 3. 设置构建用户
 # ==============================
 echo "================================================="
-echo ">> [3/5] Setting up builder user..."
+echo ">> [3/6] Setting up builder user..."
 useradd -m builder
 echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 chown -R builder:builder .
@@ -63,7 +63,7 @@ chown -R builder:builder /var/cache/makepkg
 # 4. 安装 yay
 # ==============================
 echo "================================================="
-echo ">> [4/5] Installing yay..."
+echo ">> [4/6] Installing yay..."
 git clone --depth 1 https://aur.archlinux.org/yay-bin.git
 chown -R builder:builder yay-bin
 cd yay-bin
@@ -79,8 +79,19 @@ rm -rf /var/cache/makepkg/pkg
 # $1 是从命令行传入的第一个参数 (即 package name)
 echo "================================================="
 PACKAGE_NAME="$1"
-echo ">> [5/5] Building package: ${PACKAGE_NAME}..."
 
+# 安装额外依赖 (Added Feature)
+echo ">> [5/6] Checking for extra dependencies..."
+DEPENDENCIES=$(python3 scripts/get-dependencies.py packages.yaml "${PACKAGE_NAME}")
+if [ -n "$DEPENDENCIES" ]; then
+    echo ">> Found extra dependencies: $DEPENDENCIES"
+    echo ">> Installing dependencies with yay..."
+    su builder -c "yay -S --noconfirm --needed $DEPENDENCIES"
+else
+    echo ">> No extra dependencies found."
+fi
+
+echo ">> [6/6] Building package: ${PACKAGE_NAME}..."
 # 调用 build-one.sh
 # 确保传递 HOME 变量，否则 yay/makepkg 可能会找不到用户目录
 if [ -f "scripts/build-one.sh" ]; then
