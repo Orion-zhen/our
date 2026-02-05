@@ -19,7 +19,6 @@ packages:
 - name: hyprshot-gui
 - name: linux-wallpaperengine-git
 - name: llama.cpp-hip
-- name: llama.cpp-vulkan
 - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
@@ -37,6 +36,7 @@ packages:
 - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
+- name: whisper.cpp-vulkan
 # - name: winboat
 - name: wsl-open
 - name: wsl2-ssh-agent
