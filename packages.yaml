@@ -21,12 +21,6 @@ packages:
 - name: hyprshot-gui
 - name: linux-wallpaperengine-git
   dependencies:
-  - at-spi2-core
-  - libcups
-  - libxcomposite
-  - libxdamage
-  - nspr
-  - nss
   - wayland
   - wayland-protocols
 # - name: llama.cpp-hip
@@ -44,11 +38,12 @@ packages:
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
-- name: ttf-ms-win11-auto-zh_cn
+# - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
 - name: whisper.cpp-vulkan
 # - name: winboat
+- name: witr
 - name: wsl-open
 - name: wsl2-ssh-agent
 - name: zen-browser-bin
