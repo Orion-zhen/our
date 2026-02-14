@@ -23,7 +23,7 @@ packages:
   dependencies:
   - wayland
   - wayland-protocols
-# - name: llama.cpp-hip
+- name: llama.cpp-aio
 - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
@@ -41,7 +41,7 @@ packages:
 # - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
-- name: whisper.cpp-vulkan
+# - name: whisper.cpp-vulkan
 # - name: winboat
 - name: witr
 - name: wsl-open
