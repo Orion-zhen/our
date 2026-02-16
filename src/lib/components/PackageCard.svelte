@@ -96,7 +96,7 @@
 
 	<div class="flex items-end justify-between">
 		<div class="text-sm text-[var(--color-text-secondary)]">
-			<div class="font-medium">v{version}</div>
+			<div class="font-medium">{version}</div>
 			<div class="text-xs text-[var(--color-text-muted)]">arch: {arch}</div>
 		</div>
 
