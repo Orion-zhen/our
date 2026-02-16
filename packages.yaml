@@ -13,7 +13,7 @@ packages:
 - name: fcitx5-skin-fluentlight-git
 - name: fcitx5-themes-candlelight
 - name: fcitx5-theme-wechat
-- name: fuck-u-code-git
+# - name: fuck-u-code-git
 - name: grub-theme-minegrub-git
 - name: hfd-git
 - name: hoppscotch-bin
