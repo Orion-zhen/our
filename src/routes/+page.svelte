@@ -105,39 +105,71 @@ EOF`;
 	});
 
 	function setupCardAnimation() {
-		const cards = document.querySelectorAll('.package-card');
+		const cards = gsap.utils.toArray<HTMLElement>('.package-card');
 		if (cards.length === 0) return;
 
-		// Set initial state
-		gsap.set('.package-card', {
-			opacity: 0,
-			x: (i) => (i % 2 === 0 ? -60 : 60),
-			y: 50,
-			rotation: (i) => (i % 2 === 0 ? -3 : 3)
+		// Dynamically determine column positions by looking at actual layout
+		// This makes it work perfectly on mobile (1 col), tablet (2-3 col), and desktop (4 col)
+		const xPositions = cards.map((c) => c.offsetLeft);
+		const uniqueX = [...new Set(xPositions)].sort((a, b) => a - b);
+
+		cards.forEach((card) => {
+			// Get the actual column index (0 to N) based on horizontal position
+			const columnIndex = uniqueX.indexOf(card.offsetLeft);
+			const staggerOffset = columnIndex * 3;
+
+			// Base thresholds (Percentage from top of viewport)
+			const startPoint = 92 - staggerOffset;
+			const endPoint = 72 - staggerOffset;
+			const pulsePoint = endPoint - 1;
+
+			// 1. Initial hidden state
+			gsap.set(card, {
+				opacity: 0,
+				scale: 0.85,
+				y: 60,
+				filter: 'blur(15px)'
+			});
+
+			// 2. Scroll-linked Reveal
+			gsap.to(card, {
+				opacity: 1,
+				scale: 1,
+				y: 0,
+				filter: 'blur(0px)',
+				ease: 'none',
+				scrollTrigger: {
+					trigger: card,
+					start: `top ${startPoint}%`,
+					end: `top ${endPoint}%`,
+					scrub: 1.2
+				}
+			});
+
+			// 3. Activation Confirmation Pulse
+			ScrollTrigger.create({
+				trigger: card,
+				start: `top ${pulsePoint}%`,
+				onEnter: () => {
+					const tl = gsap.timeline();
+					tl.to(card, {
+						borderColor: 'rgba(6, 182, 212, 0.8)',
+						boxShadow: '0 0 25px rgba(6, 182, 212, 0.5)',
+						backgroundColor: 'rgba(255, 255, 255, 0.1)',
+						duration: 0.15,
+						ease: 'power2.out'
+					}).to(card, {
+						borderColor: 'var(--glass-border)',
+						boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+						backgroundColor: 'var(--glass-bg)',
+						duration: 0.6,
+						ease: 'power1.inOut'
+					});
+				},
+				once: true
+			});
 		});
 
-		// Create scroll trigger for animation
-		ScrollTrigger.create({
-			trigger: '.packages-container',
-			start: 'top 85%',
-			onEnter: () => {
-				gsap.to('.package-card', {
-					x: 0,
-					y: 0,
-					rotation: 0,
-					opacity: 1,
-					duration: 0.6,
-					stagger: {
-						each: 0.08,
-						from: 'start'
-					},
-					ease: 'back.out(1.2)'
-				});
-			},
-			once: true
-		});
-
-		// If already in view, trigger immediately
 		ScrollTrigger.refresh();
 	}
 </script>
