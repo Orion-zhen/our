@@ -128,7 +128,8 @@ EOF`;
 				opacity: 0,
 				scale: 0.85,
 				y: 60,
-				filter: 'blur(15px)'
+				filter: 'blur(15px)',
+				pointerEvents: 'none'
 			});
 
 			// 2. Scroll-linked Reveal
@@ -142,7 +143,14 @@ EOF`;
 					trigger: card,
 					start: `top ${startPoint}%`,
 					end: `top ${endPoint}%`,
-					scrub: 1.2
+					scrub: 1.2,
+					onLeave: () => gsap.set(card, { pointerEvents: 'auto' }),
+					onEnterBack: () => gsap.set(card, { pointerEvents: 'none' }),
+					onRefresh: (self) => {
+						// Ensure state is correct after a refresh/init (e.g. reload at bottom)
+						const progress = self.progress;
+						gsap.set(card, { pointerEvents: progress === 1 ? 'auto' : 'none' });
+					}
 				}
 			});
 

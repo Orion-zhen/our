@@ -63,10 +63,31 @@
 	}
 
 	.typewriter-text {
-		background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-accent) 100%);
+		background: linear-gradient(
+			135deg,
+			var(--color-text-primary) 0%,
+			var(--color-accent) 50%,
+			var(--color-text-primary) 100%
+		);
+		background-size: 200% auto;
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
+		transition: background-position 0.5s ease;
+	}
+
+	.typewriter:hover .typewriter-text {
+		background-position: right center;
+		animation: shimmer 2s linear infinite;
+	}
+
+	@keyframes shimmer {
+		0% {
+			background-position: 0% 50%;
+		}
+		100% {
+			background-position: 100% 50%;
+		}
 	}
 
 	.typewriter-cursor {
@@ -74,7 +95,6 @@
 		margin-left: 2px;
 		font-weight: 300;
 		color: var(--color-accent);
-		animation: none;
 	}
 
 	.typewriter-cursor.blinking {
