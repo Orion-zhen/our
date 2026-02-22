@@ -61,10 +61,10 @@ for REPO in "$@"; do
         if [ -n "$INPUT_BASE" ]; then
             echo "--> Base package specified. Fetching PKGBUILD for '$INPUT_BASE' from AUR."
             git clone --depth 1 "https://aur.archlinux.org/$INPUT_BASE.git"
-            
+
             WORK_DIR="$ROOT_DIR/$INPUT_BASE"
             cd "$WORK_DIR"
-            
+
             echo "--> Patching pkgname in PKGBUILD to '$REPO'..."
             echo "" >> PKGBUILD
             echo "pkgname=\"$REPO\"" >> PKGBUILD
