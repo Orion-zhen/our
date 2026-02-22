@@ -83,6 +83,7 @@ jobs:
       dependencies: ${{ matrix.package.dependencies }}
       exclude: ${{ matrix.package.exclude }}
       base: ${{ matrix.package.base }}
+      custom-env: ${{ matrix.package.env }}
       lto: true
     secrets: inherit
 
@@ -101,6 +102,7 @@ jobs:
       dependencies: ${{ matrix.package.dependencies }}
       exclude: ${{ matrix.package.exclude }}
       base: ${{ matrix.package.base }}
+      custom-env: ${{ matrix.package.env }}
       lto: false
     secrets: inherit
 

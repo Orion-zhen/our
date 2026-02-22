@@ -32,11 +32,17 @@ def find_packages(nodes: list, lto_filter: bool, recursive: bool = False):
 
         base = node.get("base", "")
 
+        env_vars = node.get("env", [])
+        if not isinstance(env_vars, list):
+            env_vars = [env_vars] if env_vars else []
+        env_str = "\n".join(str(e) for e in env_vars)
+
         item = {
             "name": node["name"],
             "dependencies": deps_str,
             "exclude": excludes_str,
-            "base": base
+            "base": base,
+            "env": env_str
         }
 
         if lto_filter and node.get("lto") is not False:
