@@ -23,8 +23,13 @@ packages:
   dependencies:
   - wayland
   - wayland-protocols
-- name: llama.cpp-aio
 - name: llama.cpp-hip
+- name: llama.cpp-hip-gfx1151
+  base: llama.cpp-hip
+  dependencies:
+  - rocm-nightly-gfx1151-bin
+  exclude:
+  - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
 - name: llama-swap
 - name: llama-swap-bin
@@ -43,7 +48,7 @@ packages:
 - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
-# - name: whisper.cpp-vulkan
+- name: whisper.cpp-vulkan
 # - name: winboat
 - name: witr
 - name: wsl-open
