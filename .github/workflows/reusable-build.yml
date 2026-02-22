@@ -8,6 +8,21 @@ on:
         description: The package to build
         required: true
         type: string
+      dependencies:
+        description: Extra dependencies to install
+        required: false
+        type: string
+        default: ""
+      exclude:
+        description: Packages to exclude from artifacts
+        required: false
+        type: string
+        default: ""
+      base:
+        description: Base AUR package to build from
+        required: false
+        type: string
+        default: ""
       lto:
         description: Enable LTO
         default: true
@@ -80,6 +95,9 @@ jobs:
             -e CI=1 \
             -e INPUT_LTO="${{ inputs.lto }}" \
             -e INPUT_CLEAN_BUILD="${{ inputs.clean-build }}" \
+            -e INPUT_DEPENDENCIES="${{ inputs.dependencies }}" \
+            -e INPUT_EXCLUDE="${{ inputs.exclude }}" \
+            -e INPUT_BASE="${{ inputs.base }}" \
             $CUSTOM_ENV_ARGS \
             archlinux:latest \
             /bin/bash -c "chmod +x scripts/entrypoint.sh && ./scripts/entrypoint.sh ${{ inputs.package }}"

@@ -82,11 +82,10 @@ PACKAGE_NAME="$1"
 
 # 安装额外依赖 (Added Feature)
 echo ">> [5/6] Checking for extra dependencies..."
-DEPENDENCIES=$(python3 scripts/get-dependencies.py packages.yaml "${PACKAGE_NAME}")
-if [ -n "$DEPENDENCIES" ]; then
-    echo ">> Found extra dependencies: $DEPENDENCIES"
+if [ -n "$INPUT_DEPENDENCIES" ]; then
+    echo ">> Found extra dependencies: $INPUT_DEPENDENCIES"
     echo ">> Installing dependencies with yay..."
-    su builder -c "yay -S --noconfirm --needed $DEPENDENCIES"
+    su builder -c "yay -S --noconfirm --needed $INPUT_DEPENDENCIES"
 else
     echo ">> No extra dependencies found."
 fi

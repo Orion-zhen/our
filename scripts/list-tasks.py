@@ -20,10 +20,29 @@ def find_packages(nodes: list, lto_filter: bool, recursive: bool = False):
         # 检查当前节点的 'lto' 字段是否与筛选条件匹配
         # 使用 .get() 可以安全地处理节点没有 'lto' 字段的情况
         # 无 lto 时默认为启用 lto
+        deps = node.get("dependencies", [])
+        if not isinstance(deps, list):
+            deps = [deps]
+        deps_str = " ".join(deps)
+
+        excludes = node.get("exclude", [])
+        if not isinstance(excludes, list):
+            excludes = [excludes]
+        excludes_str = " ".join(excludes)
+
+        base = node.get("base", "")
+
+        item = {
+            "name": node["name"],
+            "dependencies": deps_str,
+            "exclude": excludes_str,
+            "base": base
+        }
+
         if lto_filter and node.get("lto") is not False:
-                yield node["name"]
+                yield item
         elif not lto_filter and node.get("lto") is False:
-                yield node["name"]
+                yield item
 
         # 如果存在 'dependencies' 键，则递归进入下一层
         if recursive and "dependencies" in node and node["dependencies"]:

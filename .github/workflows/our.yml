@@ -79,7 +79,10 @@ jobs:
     permissions:
       contents: write
     with:
-      package: ${{ matrix.package }}
+      package: ${{ matrix.package.name }}
+      dependencies: ${{ matrix.package.dependencies }}
+      exclude: ${{ matrix.package.exclude }}
+      base: ${{ matrix.package.base }}
       lto: true
     secrets: inherit
 
@@ -94,7 +97,10 @@ jobs:
     permissions:
       contents: write
     with:
-      package: ${{ matrix.package }}
+      package: ${{ matrix.package.name }}
+      dependencies: ${{ matrix.package.dependencies }}
+      exclude: ${{ matrix.package.exclude }}
+      base: ${{ matrix.package.base }}
       lto: false
     secrets: inherit
 
@@ -141,10 +147,17 @@ jobs:
           path: x86_64
           merge-multiple: true
 
+      - name: Install dependencies
+        run: |
+          pacman -Syu python python-pip python-zstandard nodejs npm pacman-contrib --noconfirm --overwrite '*'
+
       - name: Display downloaded files
         run: |
           echo "--- All built packages ---"
           ls -R x86_64
+
+      - name: Remove duplicate packages
+        run: paccache -r -k 1 -c x86_64
 
       - name: Generate repository database
         env:
@@ -152,9 +165,7 @@ jobs:
         run: bash scripts/repo-add.sh our
 
       - name: Generate package index page
-        run: |
-          pacman -Syu python python-pip python-zstandard nodejs npm --noconfirm --overwrite '*'
-          python scripts/packages.py
+        run: python scripts/packages.py
 
       - name: Install npm dependencies
         run: npm install && npm ci

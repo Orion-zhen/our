@@ -57,16 +57,63 @@ for REPO in "$@"; do
         echo "--> Cleaning up work directory for '$REPO'."
         rm -rf "$WORK_DIR"
 
-    # 2. 使用 AUR 中的 PKGBUILD, 则使用 yay 构建, 并用 pacman 查找所有非源中的包并移动
     else
-        echo "--> No local package found. Building '$REPO' from AUR."
-        yay -S --noconfirm --noprogressbar --overwrite '*' "$REPO"
+        if [ -n "$INPUT_BASE" ]; then
+            echo "--> Base package specified. Fetching PKGBUILD for '$INPUT_BASE' from AUR."
+            git clone --depth 1 "https://aur.archlinux.org/$INPUT_BASE.git"
+            
+            WORK_DIR="$ROOT_DIR/$INPUT_BASE"
+            cd "$WORK_DIR"
+            
+            echo "--> Patching pkgname in PKGBUILD to '$REPO'..."
+            echo "" >> PKGBUILD
+            echo "pkgname=\"$REPO\"" >> PKGBUILD
+            echo "provides+=(\"$INPUT_BASE\")" >> PKGBUILD
+            echo "conflicts+=(\"$INPUT_BASE\")" >> PKGBUILD
+
+            # 由于 makepkg -s 只能通过 pacman 安装官方源依赖，不能自动从 AUR 拉取
+            # 我们先提炼出新包的依赖，然后用 yay 把它们准备好
+            echo "--> Pre-installing AUR dependencies via yay..."
+            # 源中依赖通过 makepkg -s 安装，AUR 依赖如果此时没装，makepkg 会报错，不如直接让 yay 扫一遍该目录的依赖安装
+            # makepkg --printsrcinfo 可用于提取依赖, 但直接用 yay --builddir 下载构建更稳妥，或者利用 makepkg -s --syncdeps 的机制
+            # 其实最简单的是直接从 PKGBUILD 提取依赖调用 yay 安装：
+            source PKGBUILD
+            if [ -n "${depends[*]}" ] || [ -n "${makedepends[*]}" ]; then
+                yay -S --noconfirm --needed "${depends[@]}" "${makedepends[@]}" 2>/dev/null || true
+            fi
+
+            echo "--> Building patched package '$REPO'..."
+            # --syncdeps (-s) is used to install standard repo missing dependencies
+            makepkg -sfcL --noconfirm --noprogressbar
+
+            echo "--> Moving built patched packages to root directory..."
+            # For makepkg, it goes to PKGDEST and/or current dir. Check both.
+            find . -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "$ROOT_DIR/" \; 2>/dev/null || true
+            find "/var/cache/makepkg/pkg" -name "${REPO}*.pkg.tar.zst*" -exec mv {} "$ROOT_DIR/" \; 2>/dev/null || true
+
+            cd "$ROOT_DIR"
+            rm -rf "$WORK_DIR"
+        else
+            echo "--> No local package found. Building '$REPO' from AUR."
+            yay -S --noconfirm --noprogressbar --overwrite '*' "$REPO"
+        fi
 
         echo "--> Moving built packages to root directory..."
         # 2. 使用 yay 构建的包
         # 构建结果放在 `configs/makepkg.conf` 中 `PKGDEST` 变量的目录中
         # 被配置为 `/var/cache/makepkg/pkg`
+        read -r -a EXCLUDES_ARRAY <<< "$INPUT_EXCLUDE"
         for foreign in $(pacman -Qmq); do
+            skip=false
+            for e in "${EXCLUDES_ARRAY[@]}"; do
+                if [ "$foreign" == "$e" ]; then
+                    echo "--> Skipping excluded package: '$foreign'"
+                    skip=true
+                    break
+                fi
+            done
+            if [ "$skip" == "true" ]; then continue; fi
+
             find "/var/cache/makepkg/pkg" -name "${foreign}*" -exec mv {} "$ROOT_DIR/" \;
         done
 

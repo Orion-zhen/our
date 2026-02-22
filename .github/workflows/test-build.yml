@@ -7,6 +7,21 @@ on:
         description: AUR package to test build
         required: true
         type: string
+      dependencies:
+        description: Extra dependencies to install
+        required: false
+        type: string
+        default: ""
+      exclude:
+        description: Packages to exclude from artifacts
+        required: false
+        type: string
+        default: ""
+      base:
+        description: Base AUR package to build from
+        required: false
+        type: string
+        default: ""
       lto:
         description: Enable LTO
         default: true
@@ -30,6 +45,9 @@ jobs:
     uses: ./.github/workflows/reusable-build.yml
     with:
       package: ${{ inputs.package }}
+      dependencies: ${{ inputs.dependencies }}
+      exclude: ${{ inputs.exclude }}
+      base: ${{ inputs.base }}
       lto: ${{ inputs.lto }}
       gpg-sign: ${{ inputs.gpg-sign }}
       clean-build: ${{ inputs.clean-build }}
