@@ -5,7 +5,7 @@ set -e
 # 1. 基础环境准备 (所有情况通用)
 # ==============================
 echo "================================================="
-echo ">> [1/6] Preparing base environment..."
+echo ">> [1/7] Preparing base environment..."
 
 # 移除 pacman.conf 中的 VerbosePkgLists 以减少日志噪音
 sed -i '/VerbosePkgLists/d' /etc/pacman.conf
@@ -17,11 +17,15 @@ pacman -Syu --noconfirm --overwrite '*' base-devel git pacman-contrib mold pytho
 # patch makepkg 允许 root 运行 (虽然我们在下面会创建 builder 用户，但这一步通常是为了兼容性或特殊操作)
 sed -i '/E_ROOT/d' /usr/bin/makepkg
 
+# 全局关闭构建过程中的压缩，以加速不必要发布的包 (如 yay-bin, 编译时依赖等) 的生成
+# 我们将在 entrypoint.sh 最后统一对需要发布的包进行高强度压缩
+echo "PKGEXT='.pkg.tar'" >> /etc/makepkg.conf
+
 # ==============================
 # 2. 配置 makepkg.conf (核心逻辑)
 # ==============================
 echo "================================================="
-echo ">> [2/6] Configuring makepkg..."
+echo ">> [2/7] Configuring makepkg..."
 echo "   INPUT_LTO: ${INPUT_LTO}"
 echo "   INPUT_CLEAN_BUILD: ${INPUT_CLEAN_BUILD}"
 
@@ -50,7 +54,7 @@ fi
 # 3. 设置构建用户
 # ==============================
 echo "================================================="
-echo ">> [3/6] Setting up builder user..."
+echo ">> [3/7] Setting up builder user..."
 useradd -m builder
 echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 chown -R builder:builder .
@@ -63,7 +67,7 @@ chown -R builder:builder /var/cache/makepkg
 # 4. 安装 yay
 # ==============================
 echo "================================================="
-echo ">> [4/6] Installing yay..."
+echo ">> [4/7] Installing yay..."
 git clone --depth 1 https://aur.archlinux.org/yay-bin.git
 chown -R builder:builder yay-bin
 cd yay-bin
@@ -81,7 +85,7 @@ echo "================================================="
 PACKAGE_NAME="$1"
 
 # 安装额外依赖 (Added Feature)
-echo ">> [5/6] Checking for extra dependencies..."
+echo ">> [5/7] Checking for extra dependencies..."
 if [ -n "$INPUT_DEPENDENCIES" ]; then
     echo ">> Found extra dependencies: $INPUT_DEPENDENCIES"
     echo ">> Installing dependencies with yay..."
@@ -90,7 +94,7 @@ else
     echo ">> No extra dependencies found."
 fi
 
-echo ">> [6/6] Building package: ${PACKAGE_NAME}..."
+echo ">> [6/7] Building package: ${PACKAGE_NAME}..."
 # 调用 build-one.sh
 # 确保传递 HOME 变量，否则 yay/makepkg 可能会找不到用户目录
 if [ -f "scripts/build-one.sh" ]; then
@@ -105,6 +109,16 @@ fi
 # ==============================
 # 处理非法文件名 (冒号转下划线)
 find . -maxdepth 1 -type f -name '*:*' | while IFS= read -r file; do mv "$file" "${file//:/_}"; done
+
+echo "================================================="
+echo ">> [7/7] Compressing published packages with zstd (high ratio)..."
+shopt -s nullglob
+for pkg in *.pkg.tar; do
+    echo "Compressing $pkg..."
+    zstd -c -T0 -19 --rsyncable "$pkg" > "${pkg}.zst"
+    rm "$pkg"
+done
+shopt -u nullglob
 
 echo "================================================="
 echo ">> Entrypoint finished successfully."

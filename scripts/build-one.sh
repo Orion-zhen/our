@@ -49,7 +49,7 @@ for REPO in "$@"; do
         # 对于 makepkg 构建的包
         # 使用 find 来移动构建好的包和签名文件，比 'mv' 通配符更安全。
         # 如果找不到文件，find 不会报错退出，所以我们后面需要检查。
-        find . -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "$ROOT_DIR/" \;
+        find . -maxdepth 1 -name "*.pkg.tar" -exec mv {} "$ROOT_DIR/" \;
 
         cd "$ROOT_DIR"
 
@@ -88,8 +88,8 @@ for REPO in "$@"; do
 
             echo "--> Moving built patched packages to root directory..."
             # For makepkg, it goes to PKGDEST and/or current dir. Check both.
-            find . -maxdepth 1 -name "*.pkg.tar.zst*" -exec mv {} "$ROOT_DIR/" \; 2>/dev/null || true
-            find "/var/cache/makepkg/pkg" -name "${REPO}*.pkg.tar.zst*" -exec mv {} "$ROOT_DIR/" \; 2>/dev/null || true
+            find . -maxdepth 1 -name "*.pkg.tar" -exec mv {} "$ROOT_DIR/" \; 2>/dev/null || true
+            find "/var/cache/makepkg/pkg" -name "${REPO}*.pkg.tar" -exec mv {} "$ROOT_DIR/" \; 2>/dev/null || true
 
             cd "$ROOT_DIR"
             rm -rf "$WORK_DIR"
@@ -125,7 +125,7 @@ for REPO in "$@"; do
 
     # 检查是否真的有包被移动了过来
     # `ls` 的结果通过 `wc -l` 计数，如果不为 0，说明成功了
-    if [ $(ls -1 ${REPO}*.pkg.tar.zst 2>/dev/null | wc -l) -eq 0 ]; then
+    if [ $(ls -1 ${REPO}*.pkg.tar 2>/dev/null | wc -l) -eq 0 ]; then
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         echo "!!! Critical Error: Build for '$REPO' did not produce any package files."
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -140,5 +140,5 @@ done
 echo "================================================="
 echo "All packages built successfully!"
 echo "Final packages in root directory:"
-ls -l *.pkg.tar.zst*
+ls -l *.pkg.tar
 echo "================================================="
