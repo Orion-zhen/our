@@ -115,7 +115,7 @@ echo ">> [7/7] Compressing published packages with zstd (high ratio)..."
 shopt -s nullglob
 for pkg in *.pkg.tar; do
     echo "Compressing $pkg..."
-    zstd -c -T0 -19 --rsyncable "$pkg" > "${pkg}.zst"
+    zstd -c -T0 --ultra -22 --rsyncable "$pkg" > "${pkg}.zst"
     rm "$pkg"
 done
 shopt -u nullglob
