@@ -24,12 +24,6 @@ packages:
   - wayland
   - wayland-protocols
 - name: llama.cpp-hip
-- name: llama.cpp-hip-gfx1151
-  base: llama.cpp-hip
-  dependencies:
-  - rocm-nightly-gfx1151-bin
-  exclude:
-  - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
 - name: llama-swap
 - name: llama-swap-bin
@@ -39,6 +33,8 @@ packages:
 # - name: niri-git
 #   lto: false
 - name: nodejs-gitmoji-cli
+- name: opencode-md-table-formatter
+- name: opencode-notifier
 - name: pmount
 - name: protonplus
 - name: python-gguf
