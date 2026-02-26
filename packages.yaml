@@ -3,7 +3,6 @@ packages:
   dependencies:
   - pango
 - name: antigravity
-- name: asciinema-agg
 - name: ascii-image-converter
 - name: clipse-git
 - name: cmd-wrapped
