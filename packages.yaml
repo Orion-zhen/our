@@ -3,6 +3,7 @@ packages:
   dependencies:
   - pango
 - name: antigravity
+- name: asciinema-agg
 - name: ascii-image-converter
 - name: clipse-git
 - name: cmd-wrapped
@@ -13,6 +14,9 @@ packages:
 - name: fcitx5-skin-fluentlight-git
 - name: fcitx5-themes-candlelight
 - name: fcitx5-theme-wechat
+- name: fortune-mod-archlinux
+- name: fortune-mod-off
+- name: fortune-mod-zh
 # - name: fuck-u-code-git
 - name: grub-theme-minegrub-git
 - name: hfd-git
@@ -33,11 +37,14 @@ packages:
 # - name: niri-git
 #   lto: false
 - name: nodejs-gitmoji-cli
+- name: nodejs-mapscii
 - name: opencode-antigravity-auth
 - name: opencode-md-table-formatter
 - name: opencode-notifier
 - name: opencode-pty
+- name: peaclock
 - name: pmount
+- name: posting
 - name: protonplus
 - name: python-gguf
 - name: toolong
