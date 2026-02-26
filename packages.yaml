@@ -33,8 +33,10 @@ packages:
 # - name: niri-git
 #   lto: false
 - name: nodejs-gitmoji-cli
+- name: opencode-antigravity-auth
 - name: opencode-md-table-formatter
 - name: opencode-notifier
+- name: opencode-pty
 - name: pmount
 - name: protonplus
 - name: python-gguf
@@ -44,7 +46,6 @@ packages:
 - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
-- name: whisper.cpp-vulkan
 # - name: winboat
 - name: witr
 - name: wsl-open
