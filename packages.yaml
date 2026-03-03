@@ -19,9 +19,10 @@ packages:
 # - name: fuck-u-code-git
 - name: grub-theme-minegrub-git
 - name: hfd-git
-- name: hoppscotch-bin
 - name: hyprls-git
 - name: hyprshot-gui
+- name: linux-tachyon
+- name: linux-tachyon-headers
 - name: linux-wallpaperengine-git
   dependencies:
   - wayland
