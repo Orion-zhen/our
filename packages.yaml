@@ -18,6 +18,7 @@ packages:
 - name: fortune-mod-off
 - name: fortune-mod-zh
 # - name: fuck-u-code-git
+- name: grepai-git
 - name: grub-theme-minegrub-git
 - name: hfd-git
 - name: hyprls-git
