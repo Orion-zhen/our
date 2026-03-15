@@ -3,7 +3,7 @@ packages:
   dependencies:
   - pango
 - name: alt-sendme-bin
-- name: antigravity
+# - name: antigravity
 - name: ascii-image-converter
 - name: clipse-git
 - name: cmd-wrapped
@@ -18,7 +18,6 @@ packages:
 - name: fortune-mod-off
 - name: fortune-mod-zh
 # - name: fuck-u-code-git
-- name: grepai-git
 - name: grub-theme-minegrub-git
 - name: hfd-git
 - name: hyprls-git
@@ -40,7 +39,7 @@ packages:
 #   lto: false
 - name: nodejs-gitmoji-cli
 - name: nodejs-mapscii
-- name: opencode-antigravity-auth
+- name: opencode-dynamic-context-pruning
 - name: opencode-md-table-formatter
 - name: opencode-notifier
 - name: opencode-pty
