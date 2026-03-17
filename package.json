@@ -19,7 +19,6 @@
 		"@sveltejs/vite-plugin-svelte": "latest",
 		"@tailwindcss/forms": "latest",
 		"@tailwindcss/typography": "latest",
-		"@tailwindcss/vite": "latest",
 		"prettier": "latest",
 		"prettier-plugin-svelte": "latest",
 		"prettier-plugin-tailwindcss": "latest",
