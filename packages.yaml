@@ -58,4 +58,4 @@ packages:
 - name: wsl-open
 - name: wsl2-ssh-agent
 - name: zen-browser-bin
-- name: zwap-disable-writeback
+- name: zswap-disable-writeback
