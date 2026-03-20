@@ -5,6 +5,7 @@ packages:
 - name: alt-sendme-bin
 # - name: antigravity
 - name: ascii-image-converter
+- name: clight
 - name: clipse-git
 - name: cmd-wrapped
 - name: dms-shell-niri
@@ -22,8 +23,6 @@ packages:
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
-- name: linux-tachyon
-- name: linux-tachyon-headers
 - name: linux-wallpaperengine-git
   dependencies:
   - wayland
@@ -59,3 +58,4 @@ packages:
 - name: wsl-open
 - name: wsl2-ssh-agent
 - name: zen-browser-bin
+- name: zwap-disable-writeback
