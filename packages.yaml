@@ -38,6 +38,10 @@ packages:
 #   lto: false
 - name: nodejs-gitmoji-cli
 - name: nodejs-mapscii
+- name: ntfsplus-dkms-git
+  dependencies:
+  - ntfsplus-udev
+  - ntfsprogs-plus-git
 - name: opencode-dynamic-context-pruning
 - name: opencode-md-table-formatter
 - name: opencode-notifier
