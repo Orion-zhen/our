@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # 清理磁盘空间
       - name: Free Disk Space (Ubuntu)
@@ -112,7 +112,7 @@ jobs:
 
       - name: Import GPG key
         if: ${{ inputs.gpg-sign }}
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.GPG_SEC_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
@@ -130,7 +130,7 @@ jobs:
           echo "Every package is signed"
 
       - name: Upload built package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.package }} # 使用包名作为构件名，更清晰
           path: |

@@ -20,7 +20,7 @@ jobs:
       actions: write
     steps:
       - name: Clean workflow logs
-        uses: igorjs/gh-actions-clean-workflow@v6
+        uses: igorjs/gh-actions-clean-workflow@v7
         with:
           runs_older_than: ${{ github.event.inputs.runs_older_than }} || env.SCHEDULED_RUNS_OLDER_THAN
 
