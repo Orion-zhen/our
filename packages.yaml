@@ -28,11 +28,16 @@ packages:
   - wayland
   - wayland-protocols
 - name: llama.cpp-hip
+- name: llama.cpp-gfx1151
+  dependencies:
+  - rocm-nightly-gfx1151-bin
+  exclude:
+  - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
-- name: llama-swap
+# - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
-- name: mihomo-party
+# - name: mihomo-party
 - name: nirius
 # - name: niri-git
 #   lto: false
@@ -54,6 +59,7 @@ packages:
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
+- name: ttf-ms-fonts
 - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
