@@ -58,14 +58,10 @@ packages:
 - name: protonplus
 # for python-vllm-rocm
 - name: python-blake3
-- name: python-diskcache
-- name: python-einops
 - name: python-gguf-git
-- name: python-mistral-common
+- name: python-mistral-common-git
 - name: python-partial-json-parser
-- name: python-pybase64
-- name: python-transformers
-  lto: false
+- name: python-pybase64-git
 # end python-vllm-rocm
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus

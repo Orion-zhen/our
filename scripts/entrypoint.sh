@@ -9,6 +9,8 @@ echo ">> [1/7] Preparing base environment..."
 
 # 移除 pacman.conf 中的 VerbosePkgLists 以减少日志噪音
 sed -i '/VerbosePkgLists/d' /etc/pacman.conf
+# 引入 archlinuxcn 源
+cat ./configs/pacman.conf >> /etc/pacman.conf
 
 # 安装基础依赖
 # 注意：先刷新 keys 和系统，确保环境是最新的

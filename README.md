@@ -5,7 +5,7 @@ Orion User's Repository for Arch Linux
 This is a repository conatins:
 
 - an unofficial Arch Linux repository called `our`
-- AUR `PKGBUILD` files (have moved to [aur-packages](https://github.com/Orion-zhen/aur-packages)) maintained by me
+- Works better with [archlinuxcn](https://www.archlinuxcn.org/) repo.
 
 The repository builder is powered by GitHub Actions. It will automatically pull AUR packages, build them, and release to my GitHub page and Huggingface repository everyday 😉
 
