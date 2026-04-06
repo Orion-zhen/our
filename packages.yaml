@@ -4,17 +4,18 @@ packages:
   - pango
 - name: alt-sendme-bin
 # - name: antigravity
+- name: apple-fonts
 - name: ascii-image-converter
 - name: clight
 - name: clipse-git
 - name: cmd-wrapped
 - name: dms-shell-niri
 - name: envfetch
-- name: fcitx5-pinyin-custom-pinyin-dictionary
 - name: fcitx5-skin-fluentdark-git
 - name: fcitx5-skin-fluentlight-git
 - name: fcitx5-themes-candlelight
 - name: fcitx5-theme-wechat
+- name: fcitx5-vinput-bin
 - name: fortune-mod-archlinux
 - name: fortune-mod-off
 - name: fortune-mod-zh
@@ -55,7 +56,17 @@ packages:
 - name: pmount
 - name: posting
 - name: protonplus
-- name: python-gguf
+# for python-vllm-rocm
+- name: python-blake3
+- name: python-diskcache
+- name: python-einops
+- name: python-gguf-git
+- name: python-mistral-common
+- name: python-partial-json-parser
+- name: python-pybase64
+- name: python-transformers
+  lto: false
+# end python-vllm-rocm
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
