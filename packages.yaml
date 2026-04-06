@@ -35,6 +35,7 @@ packages:
   exclude:
   - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
+- name: llama-benchy
 # - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
