@@ -4,7 +4,7 @@ packages:
   - pango
 - name: alt-sendme-bin
 # - name: antigravity
-- name: apple-fonts
+# - name: apple-fonts
 - name: ascii-image-converter
 - name: clight
 - name: clipse-git
