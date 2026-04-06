@@ -9,9 +9,6 @@ packages:
 - name: clight
 - name: clipse-git
 - name: cmd-wrapped
-- name: dms-shell
-  dependencies:
-  - xdg-desktop-portal-gnome
 - name: envfetch
 - name: fcitx5-skin-fluentdark-git
 - name: fcitx5-skin-fluentlight-git
@@ -37,7 +34,7 @@ packages:
   exclude:
   - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
-- name: llama-benchy
+- name: llama-benchy # 需要 python-transformers (archlinuxcn)
 # - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
