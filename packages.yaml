@@ -58,6 +58,7 @@ packages:
 - name: protonplus
 - name: python-vllm-rocm-git
   dependencies:
+  - python-pytorch-opt-rocm
   - python-compressed-tensors-git
   - python-gguf-git
   - python-openai-harmony-git
