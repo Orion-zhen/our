@@ -9,7 +9,9 @@ packages:
 - name: clight
 - name: clipse-git
 - name: cmd-wrapped
-- name: dms-shell-niri
+- name: dms-shell
+  dependencies:
+  - xdg-desktop-portal-gnome
 - name: envfetch
 - name: fcitx5-skin-fluentdark-git
 - name: fcitx5-skin-fluentlight-git
