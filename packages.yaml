@@ -56,13 +56,13 @@ packages:
 - name: pmount
 - name: posting
 - name: protonplus
-# for python-vllm-rocm
-- name: python-blake3
-- name: python-gguf-git
-- name: python-mistral-common-git
-- name: python-partial-json-parser
-- name: python-pybase64-git
-# end python-vllm-rocm
+- name: python-vllm-rocm-git
+  dependencies:
+  - python-compressed-tensors-git
+  - python-gguf-git
+  - python-openai-harmony-git
+  - python-mistral-common-git
+  lto: false
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
