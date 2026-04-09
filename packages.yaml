@@ -6,6 +6,7 @@ packages:
 # - name: antigravity
 # - name: apple-fonts
 - name: ascii-image-converter
+- name: clash-party-git
 - name: clight
 - name: clipse-git
 - name: cmd-wrapped
@@ -38,7 +39,6 @@ packages:
 # - name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
-# - name: mihomo-party
 - name: nirius
 # - name: niri-git
 #   lto: false
