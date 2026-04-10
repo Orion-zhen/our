@@ -8,9 +8,24 @@
 		size: number;
 		filename: string;
 		index: number;
+		pkgdesc?: string;
+		url?: string;
+		license?: string | string[];
+		installed_size?: number;
 	}
 
-	let { name, version, arch, size, filename, index }: Props = $props();
+	let {
+		name,
+		version,
+		arch,
+		size,
+		filename,
+		index,
+		pkgdesc,
+		url,
+		license,
+		installed_size
+	}: Props = $props();
 
 	// Format bytes to human readable
 	function formatBytes(bytes: number, decimals = 1): { value: string; unit: string } {
@@ -40,8 +55,10 @@
 	}
 
 	const formattedSize = $derived(formatBytes(size));
+	const formattedInstalledSize = $derived(installed_size ? formatBytes(installed_size) : null);
 	const sizeColor = $derived(getSizeColor(size));
 	const downloadUrl = $derived(`${base}/x86_64/${filename}`);
+	const licenseStr = $derived(Array.isArray(license) ? license.join(', ') : license);
 
 	// 3D tilt & Spotlight tracking
 	let cardElement: HTMLElement;
@@ -50,6 +67,7 @@
 	let mouseX = $state(0);
 	let mouseY = $state(0);
 	let isHovering = $state(false);
+	let flipped = $state(false);
 
 	function handleMouseMove(e: MouseEvent) {
 		if (!cardElement) return;
@@ -76,15 +94,26 @@
 		tiltX = 0;
 		tiltY = 0;
 	}
+
+	function handleCardClick(e: MouseEvent) {
+		// Only flip if not clicking a link or button on the front side
+		const target = e.target as HTMLElement;
+		if (target.closest('.no-flip')) return;
+
+		flipped = !flipped;
+	}
 </script>
 
-<a
-	href={downloadUrl}
+<div
+	role="button"
+	tabindex="0"
 	bind:this={cardElement}
 	onmousemove={handleMouseMove}
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
-	class="package-card glass-card relative block flex h-[160px] cursor-pointer flex-col justify-between p-5 no-underline"
+	onclick={handleCardClick}
+	onkeydown={(e) => e.key === 'Enter' && handleCardClick(e as any)}
+	class="package-card glass-card relative h-[160px] cursor-pointer"
 	style="
 		--index: {index};
 		--mouse-x: {mouseX}px;
@@ -95,35 +124,124 @@
 		transition: {isHovering
 		? 'box-shadow 0.3s, border-color 0.3s'
 		: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'};
+		transform-style: preserve-3d;
 	"
 >
 	<div
-		class="package-name relative z-20 text-lg leading-tight font-semibold break-all text-[var(--color-text-primary)]"
+		class="card-inner {flipped ? 'is-flipped' : ''}"
+		style="transform: rotateY({flipped ? 180 : 0}deg);"
 	>
-		{name}
-	</div>
+		<!-- Back Face (Initial view - Original Layout) -->
+		<div class="card-face card-back flex flex-col justify-between p-5">
+			<div
+				class="package-name relative z-20 text-lg leading-tight font-semibold break-all text-[var(--color-text-primary)]"
+			>
+				{name}
+			</div>
 
-	<div class="relative z-20 flex items-end justify-between">
-		<div class="text-sm text-[var(--color-text-secondary)]">
-			<div class="font-medium">{version}</div>
-			<div class="text-xs text-[var(--color-text-muted)]">arch: {arch}</div>
+			<div class="relative z-20 flex items-end justify-between">
+				<div class="text-sm text-[var(--color-text-secondary)]">
+					<div class="font-medium">{version}</div>
+					<div class="text-xs text-[var(--color-text-muted)]">arch: {arch}</div>
+				</div>
+
+				<div
+					class="rounded-md px-3 py-1 font-mono text-sm font-medium shadow-lg"
+					style="background-color: {sizeColor}; color: #0a0a0f;"
+				>
+					{formattedSize.value}
+					{formattedSize.unit}
+				</div>
+			</div>
 		</div>
 
-		<div
-			class="rounded-md px-3 py-1 font-mono text-sm font-medium shadow-lg"
-			style="background-color: {sizeColor}; color: #0a0a0f;"
-		>
-			{formattedSize.value}
-			{formattedSize.unit}
+		<!-- Front Face (Rotated 180, Info Detail) -->
+		<div class="card-face card-front flex flex-col justify-between p-4 outline-1 -outline-offset-1 outline-[var(--color-border)]">
+			<div class="overflow-y-auto pr-1 text-[11px] leading-relaxed scrollbar-hide">
+				{#if pkgdesc}
+					<p class="mb-2 font-medium text-[var(--color-text-primary)] line-clamp-2" title={pkgdesc}>
+						{pkgdesc}
+					</p>
+				{/if}
+
+				<div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[var(--color-text-muted)] mt-1">
+					{#if licenseStr}
+						<span>License:</span>
+						<span class="text-[var(--color-text-secondary)] truncate">{licenseStr}</span>
+					{/if}
+					{#if formattedInstalledSize}
+						<span>Installed:</span>
+						<span class="text-[var(--color-text-secondary)]"
+							>{formattedInstalledSize.value} {formattedInstalledSize.unit}</span
+						>
+					{/if}
+					{#if url}
+						<span>Project:</span>
+						<a
+							href={url}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="no-flip truncate text-[var(--color-accent)] hover:underline"
+						>
+							{url.replace(/^https?:\/\//, '')}
+						</a>
+					{/if}
+				</div>
+			</div>
+
+			<a
+				href={downloadUrl}
+				title="Download Package"
+				class="no-flip absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[var(--color-text-secondary)] shadow-lg backdrop-blur-md transition-all duration-300 ease-out hover:scale-110 hover:border-white/20 hover:bg-white/10 hover:text-[var(--color-text-primary)]"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+					<polyline points="7 10 12 15 17 10"></polyline>
+					<line x1="12" y1="15" x2="12" y2="3"></line>
+				</svg>
+			</a>
 		</div>
 	</div>
-</a>
+</div>
 
 <style>
 	.package-card {
-		transform-style: preserve-3d;
 		/* Ensure border-color doesn't conflict during hover flow */
 		border-color: var(--glass-border);
+	}
+
+	.card-inner {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		transform-style: preserve-3d;
+		transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.card-face {
+		position: absolute;
+		inset: 0;
+		backface-visibility: hidden;
+		border-radius: inherit;
+		overflow: hidden;
+	}
+
+	.card-front {
+		transform: rotateY(180deg);
+	}
+
+	.card-back {
+		transform: rotateY(0deg);
 	}
 
 	/* Spotlight Effect - Clips inside the border radius automatically */
@@ -179,3 +297,4 @@
 		opacity: 1;
 	}
 </style>
+

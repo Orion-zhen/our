@@ -267,6 +267,10 @@ EOF`;
 							arch={pkg.arch}
 							size={pkg.size}
 							filename={pkg.filename}
+							pkgdesc={pkg.pkgdesc}
+							url={pkg.url}
+							license={pkg.license}
+							installed_size={pkg.installed_size}
 							index={i}
 						/>
 					{/each}
