@@ -169,24 +169,24 @@
 						</p>
 					{/if}
 
-					<div class="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-[var(--color-text-muted)]">
+					<div class="mt-1 grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-[var(--color-text-muted)]">
 						{#if licenseStr}
-							<span>License:</span>
-							<span class="truncate text-[var(--color-text-secondary)]">{licenseStr}</span>
+							<span class="opacity-70">License:</span>
+							<span class="truncate text-[var(--color-text-secondary)] font-medium">{licenseStr}</span>
 						{/if}
 						{#if formattedInstalledSize}
-							<span>Installed:</span>
-							<span class="text-[var(--color-text-secondary)]"
+							<span class="opacity-70">Installed:</span>
+							<span class="text-[var(--color-text-secondary)] font-medium"
 								>{formattedInstalledSize.value} {formattedInstalledSize.unit}</span
-						>
+							>
 						{/if}
 						{#if url}
-							<span>Project:</span>
+							<span class="opacity-70">Project:</span>
 							<a
 								href={url}
 								target="_blank"
 								rel="noopener noreferrer"
-								class="no-flip truncate text-[var(--color-accent)] hover:underline"
+								class="no-flip truncate text-[var(--color-accent)] font-medium hover:underline"
 							>
 								{url.replace(/^https?:\/\//, '')}
 							</a>
