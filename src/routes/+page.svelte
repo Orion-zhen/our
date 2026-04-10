@@ -16,6 +16,10 @@
 		arch: string;
 		size: number;
 		filename: string;
+		pkgdesc: string;
+		url: string;
+		license: string | string[];
+		installed_size: number;
 	}
 
 	let packages = $state<Package[]>([]);
