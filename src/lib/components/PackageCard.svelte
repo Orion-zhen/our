@@ -197,7 +197,7 @@
 				<a
 					href={downloadUrl}
 					title="Download Package"
-					class="no-flip absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[var(--color-text-secondary)] shadow-lg backdrop-blur-md transition-all duration-300 ease-out hover:scale-110 hover:border-white/20 hover:bg-white/10 hover:text-[var(--color-text-primary)]"
+					class="no-flip download-btn"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -316,6 +316,56 @@
 
 	.card-stage:hover .card-face::after {
 		opacity: 1;
+	}
+
+	/* Water Drop Download Button */
+	.download-btn {
+		position: absolute;
+		right: 12px;
+		bottom: 12px;
+		width: 42px;
+		height: 42px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border-radius: 30% 70% 52% 48% / 50% 60% 40% 50%;
+		box-shadow:
+			4px 4px 10px rgba(0, 0, 0, 0.2),
+			inset 2px 2px 5px rgba(255, 255, 255, 0.2),
+			inset -2px -2px 5px rgba(0, 0, 0, 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+		color: var(--color-text-secondary);
+		transform: translateZ(20px);
+		transform-style: preserve-3d;
+		will-change: backdrop-filter;
+		z-index: 30;
+		animation: water-float 3s infinite alternate-reverse ease-in-out;
+	}
+
+	.download-btn:hover {
+		border-radius: 39% 61% 52% 48% / 57% 55% 45% 43%;
+		transform: translateZ(30px) scale(1.1) rotate(5deg);
+		color: var(--color-text-primary);
+		background: rgba(255, 255, 255, 0.15);
+		box-shadow:
+			6px 6px 15px rgba(0, 0, 0, 0.3),
+			inset 3px 3px 6px rgba(255, 255, 255, 0.3),
+			inset -3px -3px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	@keyframes water-float {
+		0% {
+			border-radius: 30% 70% 52% 48% / 50% 60% 40% 50%;
+			transform: translate(0, 0);
+		}
+		100% {
+			border-radius: 45% 55% 65% 35% / 40% 45% 55% 60%;
+			transform: translate(2px, -3px);
+		}
 	}
 </style>
 
