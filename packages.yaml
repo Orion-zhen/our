@@ -41,8 +41,8 @@ packages:
 - name: llama-swap-bin
 - name: matugen-git
 - name: nirius
-# - name: niri-git
-#   lto: false
+- name: niri-git
+  lto: false
 - name: nodejs-gitmoji-cli
 - name: nodejs-mapscii
 - name: ntfsplus-dkms-git
