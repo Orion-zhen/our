@@ -24,7 +24,14 @@ If you want some nice packages in AUR, just feel free to issue 🤗
 
 ## Usage
 
-To use this repository, add it to your `/etc/pacman.conf`:
+First, receive my GPG key:
+
+```bash
+sudo pacman-key --recv-keys A3FDD6FAAEE2C0D0 --keyserver keyserver.ubuntu.com
+sudo pacman-key --lsign-key A3FDD6FAAEE2C0D0
+```
+
+Then add the repository to your `/etc/pacman.conf`:
 
 ```text
 [our]
