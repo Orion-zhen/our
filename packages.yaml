@@ -64,6 +64,7 @@ packages:
 - name: python-torchaudio-rocm
 # - name: python-torchvision-rocm
 # python-vllm-rocm-git 依赖结束
+- name: spark-store
 - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
