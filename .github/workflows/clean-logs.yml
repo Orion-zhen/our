@@ -13,5 +13,3 @@ jobs:
     steps:
       - name: Clean workflow logs
         uses: igorjs/gh-actions-clean-workflow@v7
-        with:
-          runs_older_than: 7
