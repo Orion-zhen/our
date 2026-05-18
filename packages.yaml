@@ -33,7 +33,7 @@ packages:
   - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
 - name: llama-benchy # 需要 python-transformers (archlinuxcn)
-# - name: llama-swap
+- name: llama-swap
 - name: llama-swap-bin
 - name: matugen-git
 - name: nirius
@@ -65,7 +65,7 @@ packages:
 # - name: python-torchvision-rocm
 # python-vllm-rocm-git 依赖结束
 - name: spark-store
-- name: toolong
+# - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
 - name: ttf-lxgw-wenkai-nerd
 - name: ttf-ms-fonts
