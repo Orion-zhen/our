@@ -1,7 +1,7 @@
 <script lang="ts">
 	import './layout.css';
 	import { onMount } from 'svelte';
-	const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+	import { asset } from '$app/paths';
 	import Lenis from '@studio-freight/lenis';
 	import gsap from 'gsap';
 	import Constellation from '$lib/components/Constellation.svelte';
@@ -53,7 +53,7 @@
 	/>
 	<meta name="keywords" content="archlinux, repository, aur, packages, pacman" />
 	<meta name="author" content="Orion-zhen" />
-	<link rel="icon" href="{base}/favicon.svg" type="image/svg+xml" />
+	<link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
 </svelte:head>
 
 <div class="gradient-bg relative min-h-screen overflow-hidden">

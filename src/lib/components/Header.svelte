@@ -1,5 +1,5 @@
 <script lang="ts">
-	const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import Magnetic from '$lib/components/Magnetic.svelte';
 
@@ -28,7 +28,7 @@
 >
 	<div class="mx-auto flex max-w-6xl items-center justify-between px-6">
 		<Magnetic strength={0.2}>
-			<a href="{base}/" class="text-gradient block p-2 text-2xl font-bold"> OUR </a>
+			<a href={resolve('/')} class="text-gradient block p-2 text-2xl font-bold"> OUR </a>
 		</Magnetic>
 		<nav class="flex items-center gap-6">
 			<Magnetic strength={0.3}>

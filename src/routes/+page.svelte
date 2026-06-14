@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+	import { asset } from '$app/paths';
 	import gsap from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import Header from '$lib/components/Header.svelte';
@@ -44,7 +44,7 @@ EOF`;
 	onMount(async () => {
 		// Load packages
 		try {
-			const res = await fetch(`${base}/packages.json`);
+			const res = await fetch(asset('/packages.json'));
 			packages = await res.json();
 		} catch (e) {
 			console.error('Failed to load packages:', e);
