@@ -35,8 +35,6 @@ packages:
   - rocm-nightly-gfx1151-bin
 - name: llama.cpp-vulkan
 - name: llama-benchy # 需要 python-transformers (archlinuxcn)
-- name: llama-swap
-- name: llama-swap-bin
 - name: matugen-git
 - name: nirius
 - name: niri-git
