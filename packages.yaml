@@ -50,6 +50,7 @@ packages:
 - name: opencode-notifier
 - name: opencode-pty
 - name: peaclock
+- name: pi
 - name: pmount
 - name: posting
 - name: protonplus
