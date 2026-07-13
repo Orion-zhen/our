@@ -72,6 +72,7 @@ packages:
 - name: ttf-ms-win11-auto-zh_cn
 - name: tex-fmt
 - name: vicinae
+- name: wavesonic-git
 # - name: winboat
 - name: witr
 - name: wsl-open
