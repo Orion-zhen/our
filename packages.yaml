@@ -6,6 +6,9 @@ packages:
 # - name: antigravity
 # - name: apple-fonts
 - name: ascii-image-converter
+- name: audio.cpp-cuda-git
+- name: audio.cpp-hip-git
+- name: audio.cpp-vulkan-git
 - name: clash-party-git
 - name: clight
 - name: clipse-git
