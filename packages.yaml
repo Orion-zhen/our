@@ -29,6 +29,8 @@ packages:
 - name: hyprshot-gui
 - name: lib32-libpcap
 - name: lib32-libvdpau
+  dependencies:
+  - lib32-gcc-libs
 - name: linux-wallpaperengine-git
 - name: llama.cpp-hip-git
 - name: llama.cpp-gfx1151
