@@ -27,6 +27,8 @@ packages:
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
+- name: lib32-libpcap
+- name: lib32-libvdpau
 - name: linux-wallpaperengine-git
 - name: llama.cpp-hip-git
 - name: llama.cpp-gfx1151
