@@ -32,13 +32,11 @@ packages:
   dependencies:
   - lib32-gcc-libs
 - name: linux-wallpaperengine-git
-- name: llama.cpp-hip-git
 - name: llama.cpp-gfx1151
   dependencies:
   - rocm-nightly-gfx1151-bin
   exclude:
   - rocm-nightly-gfx1151-bin
-# - name: llama.cpp-vulkan
 - name: llama-benchy # 需要 python-transformers (archlinuxcn)
 - name: matugen-git
 - name: nirius
