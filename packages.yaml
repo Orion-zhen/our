@@ -2,8 +2,6 @@ packages:
 - name: activate-linux-git
   dependencies:
   - pango
-# - name: antigravity
-# - name: apple-fonts
 - name: ascii-image-converter
 - name: audio.cpp-hip-git
 - name: audio.cpp-vulkan-git
@@ -27,17 +25,19 @@ packages:
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
-- name: lib32-libpcap
-- name: lib32-libvdpau
+- name: lib32-audit-git
+- name: lib32-libnsl-git
   dependencies:
-  - lib32-gcc-libs
+  - lib32-libtirpc-git
 - name: linux-wallpaperengine-git
 - name: llama.cpp-gfx1151
   dependencies:
   - rocm-nightly-gfx1151-bin
   exclude:
   - rocm-nightly-gfx1151-bin
-- name: llama-benchy # 需要 python-transformers (archlinuxcn)
+- name: llama-benchy
+  dependencies:
+  - python-transformers-git
 - name: matugen-git
 - name: nirius
 - name: niri-git
