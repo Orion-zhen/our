@@ -29,6 +29,9 @@ packages:
 - name: lib32-libnsl-git
   dependencies:
   - lib32-libtirpc-git
+- name: lib32-libpcap-git
+  dependencies:
+  - lib32-libnl-git
 - name: linux-wallpaperengine-git
 - name: llama.cpp-gfx1151
   dependencies:
