@@ -3,7 +3,7 @@ packages:
   dependencies:
   - pango
 - name: ascii-image-converter
-- name: audio.cpp-hip-git
+# - name: audio.cpp-hip-git
 - name: audio.cpp-vulkan-git
 - name: clash-party-git
 - name: clight
@@ -25,7 +25,7 @@ packages:
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
-# - name: lib32-audit-git
+- name: lib32-audit-git
 - name: lib32-libnsl-git
   dependencies:
   - lib32-libtirpc-git
