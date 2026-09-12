@@ -3,7 +3,7 @@ packages:
   dependencies:
   - pango
 - name: ascii-image-converter
-# - name: audio.cpp-hip-git
+- name: audio.cpp-hip-git
 - name: audio.cpp-vulkan-git
 - name: clash-party-git
 - name: clight
@@ -68,6 +68,7 @@ packages:
 - name: python-torchaudio-rocm
 # - name: python-torchvision-rocm
 # python-vllm-rocm-git 依赖结束
+- name: python-markitdown
 - name: spark-store
 # - name: toolong
 - name: ttf-lxgw-neo-xihei-plus
