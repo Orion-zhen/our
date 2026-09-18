@@ -3,7 +3,7 @@ packages:
   dependencies:
   - pango
 - name: ascii-image-converter
-- name: audio.cpp-hip-git
+# - name: audio.cpp-hip-git
 - name: audio.cpp-vulkan-git
 - name: clash-party-git
 - name: clight
@@ -53,6 +53,9 @@ packages:
   - ntfsprogs-plus-git
 - name: onechat-git
   lto: false
+- name: o-pi-desktop-git
+- name: o-pi-git
+- name: o-pi-web-git
 - name: peaclock
 - name: pi-web
 - name: pmount
