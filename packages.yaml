@@ -22,6 +22,12 @@ packages:
 # - name: fuck-u-code-git
 - name: gguf-parser
 - name: grub-theme-minegrub-git
+- name: gufo-git
+  lto: false
+  dependencies:
+  - rocm-nightly-gfx1151-bin
+  exclude:
+  - rocm-nightly-gfx1151-bin
 - name: hfd-git
 - name: hyprls-git
 - name: hyprshot-gui
