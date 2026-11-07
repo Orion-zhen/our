@@ -2,6 +2,7 @@ packages:
 - name: activate-linux-git
   dependencies:
   - pango
+- name: agent-browser
 - name: ascii-image-converter
 # - name: audio.cpp-hip-git
 - name: audio.cpp-vulkan-git
