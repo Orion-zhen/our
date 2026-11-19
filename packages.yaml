@@ -46,8 +46,6 @@ packages:
   exclude:
   - rocm-nightly-gfx1151-bin
 - name: llama-benchy
-  dependencies:
-  - python-transformers-git
 - name: matugen-git
 - name: nirius
 - name: niri-git
@@ -58,8 +56,8 @@ packages:
   dependencies:
   - ntfsplus-udev
   - ntfsprogs-plus-git
-- name: onechat-git
-  lto: false
+# - name: onechat-git
+#   lto: false
 - name: o-pi-desktop-git
 - name: o-pi-git
 - name: o-pi-web-git
