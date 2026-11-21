@@ -45,7 +45,7 @@ packages:
   - rocm-nightly-gfx1151-bin
   exclude:
   - rocm-nightly-gfx1151-bin
-- name: llama-benchy
+# - name: llama-benchy
 - name: matugen-git
 - name: nirius
 - name: niri-git
@@ -67,7 +67,7 @@ packages:
 - name: posting
 - name: protonplus
 # python-vllm-rocm-git 依赖
-- name: python-compressed-tensors-git
+# - name: python-compressed-tensors-git
 - name: python-gguf-git
 - name: python-openai-harmony-git
 - name: python-mistral-common-git
